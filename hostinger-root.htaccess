@@ -5,10 +5,9 @@
     RewriteCond %{REQUEST_URI} ^/api [NC]
     RewriteRule ^api/(.*)$ code/backend/public/$1 [L]
 
-    # 2. Serve static files from the React frontend (if they exist)
+    # 2. Serve static files from the React frontend (only if it's an actual file)
     RewriteCond %{REQUEST_URI} !^/api [NC]
-    RewriteCond %{DOCUMENT_ROOT}/code/frontend/dist%{REQUEST_URI} -f [OR]
-    RewriteCond %{DOCUMENT_ROOT}/code/frontend/dist%{REQUEST_URI} -d
+    RewriteCond %{DOCUMENT_ROOT}/code/frontend/dist%{REQUEST_URI} -f
     RewriteRule ^(.*)$ code/frontend/dist/$1 [L]
 
     # 3. Fallback all other non-API traffic to React's index.html (SPA Routing)
