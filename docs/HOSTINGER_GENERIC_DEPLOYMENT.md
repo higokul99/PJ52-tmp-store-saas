@@ -65,6 +65,10 @@ Paste the following configuration:
     RewriteEngine On
     RewriteBase /
 
+    # --- CRITICAL FIX: Stop rewrite loop if already routed to /code/ ---
+    RewriteCond %{REQUEST_URI} ^/code/ [NC]
+    RewriteRule ^ - [L]
+
     # 1. Route /api traffic to the Laravel backend
     RewriteCond %{REQUEST_URI} ^/api [NC]
     RewriteRule ^api/(.*)$ code/backend/public/$1 [L]
