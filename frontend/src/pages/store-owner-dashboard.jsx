@@ -1330,7 +1330,7 @@ export default function StoreOwnerDashboard() {
           </div>
           <div className="d-flex align-items-center gap-3">
             <a
-              href={`${window.location.protocol}//${activeStore?.subdomain || activeStore?.slug || activeStore?.name?.toLowerCase().replace(/\s+/g, '') || 'teststore1'}.${window.location.host.replace('www.', '')}`}
+              href={`${window.location.protocol}//${window.location.host}/store/${activeStore?.slug || activeStore?.subdomain || activeStore?.name?.toLowerCase().replace(/\s+/g, '') || 'teststore1'}`}
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-sm d-flex align-items-center gap-2 px-3 py-1.5 rounded-pill border fw-bold"
@@ -2115,7 +2115,7 @@ export default function StoreOwnerDashboard() {
                                         <Tag size={14} />
                                       </div>
                                       <a
-                                        href={`${window.location.protocol}//${activeStore?.subdomain || activeStore?.slug || activeStore?.name?.toLowerCase().replace(/\s+/g, '') || 'teststore1'}.${window.location.host.replace('www.', '')}/#${cat.name.toLowerCase().includes('women') ? 'women' : cat.name.toLowerCase().includes('men') ? 'men' : cat.name.toLowerCase().includes('kid') ? 'kids' : cat.name.toLowerCase().includes('accessories') ? 'accessories' : cat.name.toLowerCase().includes('tv') ? 'tv-appliances' : 'electronics'}`}
+                                        href={`${window.location.protocol}//${window.location.host}/store/${activeStore?.slug || activeStore?.subdomain || activeStore?.name?.toLowerCase().replace(/\s+/g, '') || 'teststore1'}/#${cat.name.toLowerCase().includes('women') ? 'women' : cat.name.toLowerCase().includes('men') ? 'men' : cat.name.toLowerCase().includes('kid') ? 'kids' : cat.name.toLowerCase().includes('accessories') ? 'accessories' : cat.name.toLowerCase().includes('tv') ? 'tv-appliances' : 'electronics'}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="text-decoration-underline"
@@ -2233,8 +2233,8 @@ export default function StoreOwnerDashboard() {
                                     ID&nbsp;#{activeStore.id}
                                   </span>
                                 </div>
-                                <a href={`${window.location.protocol}//${activeStore.subdomain || activeStore.slug}.${window.location.host.replace('www.', '')}`} target="_blank" rel="noopener noreferrer" className="fs-8 fw-semibold text-decoration-none" style={{ color: "#007f5f" }}>
-                                  {`${window.location.protocol}//${activeStore.subdomain || activeStore.slug}.${window.location.host.replace('www.', '')}`}
+                                <a href={`${window.location.protocol}//${window.location.host}/store/${activeStore.slug || activeStore.subdomain}`} target="_blank" rel="noopener noreferrer" className="fs-8 fw-semibold text-decoration-none" style={{ color: "#007f5f" }}>
+                                  {`${window.location.protocol}//${window.location.host}/store/${activeStore.slug || activeStore.subdomain}`}
                                 </a>
                               </div>
                               <span style={{ background: "#aee9d1", color: "#007f5f", padding: "2px 8px", borderRadius: "12px", fontSize: "0.75rem", fontWeight: "600" }}>🟢 {activeStore.status || "Active"}</span>
