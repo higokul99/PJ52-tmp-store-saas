@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
 
 import { AuthProvider, useAuth } from '../context/AuthContext';
 import { StoreProvider } from '../context/StoreContext';
@@ -45,6 +45,11 @@ const getSubdomain = () => {
     return parts[0]; // Extract 'mystore' from 'mystore.domain.com'
   }
   return null;
+};
+
+const StorefrontWrapper = () => {
+  const { slug } = useParams();
+  return <StorefrontApp subdomain={slug || 'demo'} />;
 };
 
 function AppRoutes() {
@@ -96,8 +101,8 @@ function AppRoutes() {
               <Route path="/landing" element={<LandingPage />} />
 
               {/* Storefront Pages */}
-              <Route path="/storefront" element={<Home />} />
-              <Route path="/store/:slug" element={<Home />} />
+              <Route path="/storefront" element={<StorefrontWrapper />} />
+              <Route path="/store/:slug" element={<StorefrontWrapper />} />
 
               {/* Auth Routes */}
               <Route path="/login" element={<Login />} />
