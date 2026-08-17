@@ -1,0 +1,108 @@
+body {
+  background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+  font-family: Arial, sans-serif;
+  color: #0f172a;
+}
+
+.container {
+  margin-top: 30px;
+}
+
+.admin-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 260px;
+  background: #111827;
+  color: #f9fafb;
+  padding: 24px 18px;
+}
+
+.sidebar-brand {
+  margin-bottom: 24px;
+}
+
+.sidebar-brand h3 {
+  margin-bottom: 4px;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nav-link {
+  color: #d1d5db;
+  text-decoration: none;
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  background: #2563eb;
+  color: #fff;
+}
+
+.main-content {
+  flex: 1;
+  padding: 24px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.topbar h2 {
+  margin-bottom: 4px;
+}
+
+.topbar-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.badge {
+  background: #2563eb;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.badge-soft {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: #6366f1;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+.hero-card {
+  background: linear-gradient(135deg, #4f46e5, #2563eb);
+  color: white;
+  border-radius: 16px;
+}
+
+.text-muted {
+  color: #64748b;
+}

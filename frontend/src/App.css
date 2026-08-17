@@ -1,0 +1,194 @@
+/* App.css - Layouts & Custom Component Aesthetics */
+
+.admin-wrapper {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  background-color: #f1f2f4;
+}
+
+.admin-sidebar {
+  width: 260px;
+  min-width: 260px;
+  background-color: #0b0f19;
+  color: #94a3b8;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 100;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.admin-sidebar .sidebar-header {
+  padding: 1.25rem 1.25rem 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.admin-sidebar .sidebar-logo {
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.admin-sidebar .nav-section-title {
+  padding: 1.1rem 1.25rem 0.35rem;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  font-weight: 800;
+  color: #475569;
+}
+
+.admin-sidebar .nav-item {
+  margin: 0.15rem 0.75rem;
+}
+
+.admin-sidebar .nav-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.85rem;
+  color: #94a3b8;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.86rem;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.admin-sidebar .nav-link-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.admin-sidebar .nav-link:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+.admin-sidebar .nav-link.active {
+  color: #ffffff;
+  background: linear-gradient(90deg, #008060 0%, #006e52 100%);
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 128, 96, 0.3);
+}
+
+.sidebar-badge {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.1rem 0.45rem;
+  border-radius: 12px;
+}
+
+.admin-sidebar .nav-link.active .sidebar-badge {
+  background: #ffffff;
+  color: #008060;
+}
+
+.admin-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #f1f2f4;
+  overflow-x: hidden;
+}
+
+.admin-topbar {
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--shopify-border);
+  padding: 0.75rem 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 90;
+}
+
+.topbar-search-wrapper {
+  position: relative;
+  width: 320px;
+}
+
+.topbar-search-input {
+  width: 100%;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.42rem 2.2rem 0.42rem 2.2rem;
+  font-size: 0.83rem;
+  color: #0f172a;
+  transition: all 0.2s ease;
+}
+
+.topbar-search-input:focus {
+  outline: none;
+  background: #ffffff;
+  border-color: var(--shopify-primary);
+  box-shadow: 0 0 0 3px rgba(0, 128, 96, 0.15);
+}
+
+.store-badge-pill {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  padding: 0.3rem 0.75rem;
+  border-radius: 30px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: #0f172a;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Notification Popup Drawer / Menu */
+.notification-menu {
+  width: 320px;
+  max-width: 90vw;
+  border-radius: 12px;
+  border: 1px solid var(--shopify-border);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  padding: 0.5rem 0;
+}
+
+.cart-drawer-overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(6px);
+  z-index: 1050;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.cart-drawer {
+  width: 440px;
+  max-width: 100%;
+  background: #ffffff;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.2);
+  animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
