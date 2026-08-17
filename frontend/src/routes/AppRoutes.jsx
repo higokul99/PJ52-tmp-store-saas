@@ -28,10 +28,21 @@ import StorefrontApp from '../pages/Storefront/StorefrontApp';
 const getSubdomain = () => {
   const host = window.location.hostname;
   const isIp = /^(\d{1,3}\.){3}\d{1,3}$/.test(host);
-  if (isIp || host === 'localhost') return null;
+  
+  // Define your main platform domains here (where the Aureum landing page should show)
+  const mainDomains = [
+    'localhost',
+    'palegreen-heron-317581.hostingersite.com',
+    'www.palegreen-heron-317581.hostingersite.com'
+  ];
+
+  if (isIp || mainDomains.includes(host)) {
+    return null; // Not a store subdomain, show the main landing page
+  }
+
   const parts = host.split('.');
-  if (parts.length >= 2 && parts[0] !== 'www' && parts[0] !== 'localhost') {
-    return parts[0];
+  if (parts.length >= 2 && parts[0] !== 'www') {
+    return parts[0]; // Extract 'mystore' from 'mystore.domain.com'
   }
   return null;
 };
