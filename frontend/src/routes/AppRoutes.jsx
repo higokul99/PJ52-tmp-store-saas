@@ -79,14 +79,14 @@ function AppRoutes() {
         <CartProvider>
           <AuthProvider>
             <Routes>
-              {/* Home Page (BoConcept Storefront as Main Root "/") */}
-              <Route path="/" element={<Home />} />
-              <Route path="/storefront" element={<Home />} />
-              <Route path="/store/:slug" element={<Home />} />
-
-              {/* Portal Landing Page */}
+              {/* Portal Landing Page (Aureum) as Main Root "/" */}
+              <Route path="/" element={<LandingPage />} />
               <Route path="/portal" element={<LandingPage />} />
               <Route path="/landing" element={<LandingPage />} />
+
+              {/* Storefront Pages */}
+              <Route path="/storefront" element={<Home />} />
+              <Route path="/store/:slug" element={<Home />} />
 
               {/* Auth Routes */}
               <Route path="/login" element={<Login />} />
