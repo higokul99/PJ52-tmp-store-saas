@@ -59,7 +59,11 @@ Paste the following configuration:
 
 ```apache
 <IfModule mod_rewrite.c>
+    # Ensure Apache has permission to follow symlinks/rewrites and prevent directory listing
+    Options +FollowSymLinks -Indexes
+
     RewriteEngine On
+    RewriteBase /
 
     # 1. Route /api traffic to the Laravel backend
     RewriteCond %{REQUEST_URI} ^/api [NC]
