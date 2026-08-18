@@ -97,12 +97,6 @@ export default function Checkout() {
     clearCart();
   };
 
-  const getBasePath = () => {
-    const p = window.location.pathname;
-    if (p.startsWith('/store/')) return `/store/${p.split('/')[2]}`;
-    return '/storefront';
-  };
-  const basePath = getBasePath();
 
   if (orderSuccess) {
     return (
