@@ -11,6 +11,13 @@ export default function StorefrontLayout({ storeData, categories = [], products 
   const { user, logout } = useAuth();
   const { openLoginModal } = useStorefrontAuth();
   
+  const getBasePath = () => {
+    const p = window.location.pathname;
+    if (p.startsWith('/store/')) return `/store/${p.split('/')[2]}`;
+    return '/storefront';
+  };
+  const basePath = getBasePath();
+
   const isApparelFocused = storeData?.name?.toLowerCase().includes('ajil') || storeData?.name?.toLowerCase().includes('apparel');
 
   // Compute the combined list of categories (same logic as StorefrontHome)
@@ -97,15 +104,15 @@ export default function StorefrontLayout({ storeData, categories = [], products 
               </button>
             )}
 
-            <Link to="/wishlist" className="storefront-nav-item text-decoration-none">
+            <Link to={`${basePath}/wishlist`} className="storefront-nav-item text-decoration-none">
               Wishlist
             </Link>
 
-            <Link to="/orders" className="storefront-nav-item text-decoration-none">
+            <Link to={`${basePath}/orders`} className="storefront-nav-item text-decoration-none">
               My Orders
             </Link>
 
-            <Link to="/cart" className="storefront-nav-item cart-item text-decoration-none">
+            <Link to={`${basePath}/cart`} className="storefront-nav-item cart-item text-decoration-none">
               <div className="position-relative">
                 <ShoppingCart size={18} />
                 {cartCount > 0 && (

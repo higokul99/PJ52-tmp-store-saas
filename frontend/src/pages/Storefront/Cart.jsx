@@ -8,7 +8,14 @@ export default function Cart() {
   const navigate = useNavigate();
   const { cartItems, updateQuantity, removeFromCart, cartTotal } = useStorefrontCart();
 
-  if (cartItems.length === 0) {
+  const getBasePath = () => {
+    const p = window.location.pathname;
+    if (p.startsWith('/store/')) return `/store/${p.split('/')[2]}`;
+    return '/storefront';
+  };
+  const basePath = getBasePath();
+
+  if (!cartItems || cartItems.length === 0) {
     return (
       <div className="storefront-container py-5 text-center">
         <div className="py-5 bg-white rounded shadow-sm border border-light">
@@ -17,7 +24,7 @@ export default function Cart() {
           </div>
           <h2 className="fs-3 font-bold mb-3">Your cart is empty</h2>
           <p className="text-secondary mb-4">Looks like you haven't added anything to your cart yet.</p>
-          <button className="btn btn-primary px-4 py-2" onClick={() => navigate('/')}>
+          <button className="btn btn-primary px-4 py-2" onClick={() => navigate(basePath)}>
             Continue Shopping
           </button>
         </div>
@@ -26,7 +33,7 @@ export default function Cart() {
   }
 
   const handleCheckout = () => {
-    navigate('/checkout');
+    navigate(`${basePath}/checkout`);
   };
 
   return (
@@ -107,7 +114,7 @@ export default function Cart() {
             <div className="mt-4 pt-3">
               <button 
                 className="btn btn-link text-decoration-none text-secondary d-flex align-items-center gap-2 p-0"
-                onClick={() => navigate('/')}
+                onClick={() => navigate(basePath)}
               >
                 <ArrowLeft size={16} /> Continue Shopping
               </button>

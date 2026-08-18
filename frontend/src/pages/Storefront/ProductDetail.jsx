@@ -16,12 +16,19 @@ export default function ProductDetail({ storeData, products }) {
 
   const product = products.find(p => String(p.id) === String(id) || String(p.backend_id) === String(id) || String(p.slug) === String(id));
 
+  const getBasePath = () => {
+    const p = window.location.pathname;
+    if (p.startsWith('/store/')) return `/store/${p.split('/')[2]}`;
+    return '/storefront';
+  };
+  const basePath = getBasePath();
+
   if (!product) {
     return (
       <div className="storefront-container py-5 text-center">
-        <h2>Product not found</h2>
-        <button className="btn btn-outline-secondary mt-3" onClick={() => navigate('/')}>
-          Return to Store
+        <h2 className="fs-3 font-bold mb-3">Product not found</h2>
+        <button className="btn btn-outline-secondary mt-3" onClick={() => navigate(basePath)}>
+          Back to Store
         </button>
       </div>
     );
@@ -69,7 +76,7 @@ export default function ProductDetail({ storeData, products }) {
   const handleBuyNow = () => {
     requireAuth(() => {
       addToCart({ ...product, selectedSize, selectedColor }, 1);
-      navigate('/checkout');
+      navigate(`${basePath}/checkout`);
     });
   };
 
@@ -77,7 +84,7 @@ export default function ProductDetail({ storeData, products }) {
     <div className="storefront-container py-5">
       <button 
         className="btn btn-link text-decoration-none text-secondary mb-4 d-flex align-items-center gap-2 p-0"
-        onClick={() => navigate('/')}
+        onClick={() => navigate(basePath)}
       >
         <ArrowLeft size={16} /> Back to Store
       </button>

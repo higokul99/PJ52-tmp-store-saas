@@ -217,6 +217,13 @@ export default function StorefrontApp({ subdomain }) {
     );
   }
 
+  const getBasePath = () => {
+    const p = window.location.pathname;
+    if (p.startsWith('/store/')) return `/store/${p.split('/')[2]}`;
+    return '/storefront';
+  };
+  const basePath = getBasePath();
+
   return (
     <div className="storefront-app-root">
       <StorefrontAuthProvider>
@@ -236,7 +243,7 @@ export default function StorefrontApp({ subdomain }) {
             <Route path="wishlist" element={<Wishlist />} />
             <Route path="orders" element={<MyOrders />} />
             {/* Additional routes such as /product/:id can be added here */}
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<Navigate to={basePath} replace />} />
             </Route>
           </Routes>
         </StorefrontCartProvider>

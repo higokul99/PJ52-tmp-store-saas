@@ -100,8 +100,8 @@ function AppRoutes() {
               <Route path="/landing" element={<Home />} />
 
               {/* Storefront Pages */}
-              <Route path="/storefront" element={<StorefrontWrapper />} />
-              <Route path="/store/:slug" element={<StorefrontWrapper />} />
+              <Route path="/storefront/*" element={<StorefrontWrapper />} />
+              <Route path="/store/:slug/*" element={<StorefrontWrapper />} />
 
               {/* Auth Routes */}
               <Route path="/login" element={<Login />} />

@@ -90,22 +90,39 @@ export default function Checkout() {
     clearCart();
   };
 
+  const getBasePath = () => {
+    const p = window.location.pathname;
+    if (p.startsWith('/store/')) return `/store/${p.split('/')[2]}`;
+    return '/storefront';
+  };
+  const basePath = getBasePath();
+
   if (orderSuccess) {
     return (
       <div className="storefront-container py-5 text-center">
-        <div className="bg-white p-5 rounded shadow-sm border border-light mx-auto" style={{ maxWidth: '600px' }}>
-          <div className="w-16 h-16 bg-success bg-opacity-10 text-success rounded-circle d-inline-flex align-items-center justify-content-center mb-4 mx-auto">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-              <polyline points="22 4 12 14.01 9 11.01"></polyline>
-            </svg>
+        <div className="py-5 bg-white rounded shadow-sm border border-light max-w-lg mx-auto">
+          <div className="mb-4 d-flex justify-content-center">
+            <div className="bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style={{ width: 64, height: 64 }}>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            </div>
           </div>
-          <h2 className="fs-2 font-bold mb-3">Order Confirmed!</h2>
-          <p className="text-secondary mb-4 fs-6 lh-lg">
-            Thank you for your purchase. Your order has been successfully placed. 
-            We've saved your order details and they are currently being processed.
-          </p>
-          <button className="btn btn-primary px-4 py-2" onClick={() => navigate('/')}>
+          <h2 className="fs-3 font-bold mb-3">Order Placed Successfully!</h2>
+          <p className="text-secondary mb-4">Your order has been confirmed. You will receive an email shortly.</p>
+          <button className="btn btn-primary mt-3" onClick={() => navigate(basePath)}>
+            Continue Shopping
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (cartItems.length === 0) {
+    return (
+      <div className="storefront-container py-5 text-center">
+        <div className="py-5 bg-white rounded shadow-sm border border-light max-w-lg mx-auto">
+          <h2 className="fs-3 font-bold mb-3">Your cart is empty</h2>
+          <p className="text-secondary mb-4">Looks like you haven't added anything to your cart yet.</p>
+          <button className="btn btn-primary px-4 py-2" onClick={() => navigate(basePath)}>
             Continue Shopping
           </button>
         </div>

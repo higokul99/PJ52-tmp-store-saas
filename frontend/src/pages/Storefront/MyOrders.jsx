@@ -12,6 +12,14 @@ export default function MyOrders() {
   
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const getBasePath = () => {
+    const p = window.location.pathname;
+    if (p.startsWith('/store/')) return `/store/${p.split('/')[2]}`;
+    return '/storefront';
+  };
+  const basePath = getBasePath();
 
   useEffect(() => {
     if (!user) {
@@ -177,7 +185,7 @@ export default function MyOrders() {
           </div>
           <h2 className="fs-4 fw-bold mb-3">No orders found</h2>
           <p className="text-secondary mb-4">You haven't placed any orders yet. Start exploring our store!</p>
-          <Link to="/" className="btn btn-primary px-4 py-2">
+          <Link to={basePath} className="btn btn-primary px-4 py-2">
             Continue Shopping
           </Link>
         </div>
