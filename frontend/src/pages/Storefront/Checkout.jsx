@@ -20,11 +20,18 @@ export default function Checkout() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
 
+  const getBasePath = () => {
+    const p = window.location.pathname;
+    if (p.startsWith('/store/')) return `/store/${p.split('/')[2]}`;
+    return '/storefront';
+  };
+  const basePath = getBasePath();
+
   if (cartItems.length === 0 && !orderSuccess) {
     return (
       <div className="storefront-container py-5 text-center">
         <h2>Your cart is empty</h2>
-        <button className="btn btn-primary mt-3" onClick={() => navigate('/')}>
+        <button className="btn btn-primary mt-3" onClick={() => navigate(basePath)}>
           Return to Store
         </button>
       </div>
