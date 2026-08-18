@@ -5,7 +5,6 @@ import { AuthProvider, useAuth } from '../context/AuthContext';
 import { StoreProvider } from '../context/StoreContext';
 import { CartProvider } from '../context/CartContext';
 
-import LandingPage from '../pages/LandingPage';
 import Home from '../pages/Home';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
@@ -96,9 +95,9 @@ function AppRoutes() {
           <AuthProvider>
             <Routes>
               {/* Portal Landing Page (Aureum) as Main Root "/" */}
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/portal" element={<LandingPage />} />
-              <Route path="/landing" element={<LandingPage />} />
+              <Route path="/" element={<Home />} />
+              <Route path="/portal" element={<Home />} />
+              <Route path="/landing" element={<Home />} />
 
               {/* Storefront Pages */}
               <Route path="/storefront" element={<StorefrontWrapper />} />
