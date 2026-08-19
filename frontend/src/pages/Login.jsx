@@ -133,6 +133,27 @@ const goslotLoginStyles = `
   .goslot-login-bg .text-dark {
     color: #1f2937 !important;
   }
+  
+  /* Mobile Responsiveness */
+  @media (max-width: 575px) {
+    .goslot-login-card {
+      padding: 2rem 1.5rem;
+      margin: 1rem auto;
+      border-radius: 16px;
+    }
+    .goslot-nav {
+      padding: 1rem;
+    }
+    .goslot-login-bg h1 {
+      font-size: 1.5rem !important;
+    }
+    .goslot-input {
+      padding: 0.75rem 1rem;
+    }
+    .goslot-btn-green, .goslot-btn-google {
+      padding: 0.75rem;
+    }
+  }
 `;
 
 export default function Login() {
@@ -183,11 +204,7 @@ export default function Login() {
         </div>
         
         <div className="goslot-nav-links">
-          <a href="#" className="text-decoration-none text-dark">Home</a>
-          <a href="#" className="text-decoration-none text-dark">Features</a>
-          <a href="#" className="text-decoration-none text-dark">Pricing</a>
-          <a href="#" className="text-decoration-none text-dark">Themes</a>
-          <a href="#" className="text-decoration-none text-dark">Contact</a>
+          {/* Nav links removed as requested */}
         </div>
       </nav>
 

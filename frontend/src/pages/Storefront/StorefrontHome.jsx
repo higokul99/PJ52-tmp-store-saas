@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useMemo } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { ShoppingCart, Heart } from 'lucide-react';
 import { useStorefrontCart } from '../../context/StorefrontCartContext';
 import { useStorefrontAuth } from '../../context/StorefrontAuthContext';
@@ -7,12 +7,24 @@ import { normalizeProductImage } from '../../utils/imageUtils';
 
 export default function StorefrontHome({ storeData, products, categories = [] }) {
   const { requireAuth } = useStorefrontAuth();
+  const location = useLocation();
+  const searchQuery = new URLSearchParams(location.search).get('search')?.toLowerCase() || '';
+  
+  // Filter products by search query if it exists
+  const filteredProducts = useMemo(() => {
+    if (!searchQuery) return products;
+    return products.filter(p => 
+      String(p.name || '').toLowerCase().includes(searchQuery) ||
+      String(p.description || '').toLowerCase().includes(searchQuery)
+    );
+  }, [products, searchQuery]);
+
   // Determine if this is the apparel-focused store (Ajil Store)
   const isApparelFocused = storeData?.name?.toLowerCase().includes('ajil') || storeData?.name?.toLowerCase().includes('apparel');
 
-  // Get unique category names from products (default to 'Uncategorized' if missing)
+  // Get unique category names from filteredProducts (default to 'Uncategorized' if missing)
   const productCategories = [];
-  products.forEach(p => {
+  filteredProducts.forEach(p => {
     const pCat = p.category && typeof p.category === 'object' ? (p.category.name || 'Uncategorized') : (p.category || 'Uncategorized');
     if (!productCategories.some(existing => String(existing).toLowerCase() === String(pCat).toLowerCase())) {
       productCategories.push(pCat);
@@ -164,7 +176,7 @@ export default function StorefrontHome({ storeData, products, categories = [] })
 
       {categoriesToRender.length > 0 ? (
         categoriesToRender.map(cat => {
-          const catProducts = products.filter(p => {
+          const catProducts = filteredProducts.filter(p => {
             const pCat = String((p.category && typeof p.category === 'object' ? p.category.name : p.category) || 'Uncategorized').toLowerCase();
             return pCat === String(cat.id).toLowerCase() || pCat === String(cat.name || '').toLowerCase() || pCat === String(cat.slug || '').toLowerCase();
           });

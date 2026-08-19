@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Sparkles, ArrowRight, ShieldCheck, Zap, Store, Package, ShoppingCart, DollarSign, 
-  CheckCircle, Star, Rocket, Crown, Mail, Check
+  CheckCircle, Star, Rocket, Crown, Mail, Check, Menu, X
 } from "lucide-react";
 
 const goslotStyles = `
@@ -142,11 +142,44 @@ const goslotStyles = `
   .goslot-nav-link:hover {
     color: var(--primary);
   }
+  
+  /* Mobile Responsiveness for Landing Page */
+  @media (max-width: 767px) {
+    .goslot-hero {
+      padding-top: 110px !important;
+      padding-bottom: 60px !important;
+    }
+    h1.display-4 {
+      font-size: 2.2rem !important;
+    }
+    .hero-blob.blob-1 {
+      width: 250px !important; height: 250px !important;
+      top: -50px !important; right: -50px !important;
+    }
+    .hero-blob.blob-2 {
+      width: 200px !important; height: 200px !important;
+      bottom: -50px !important; left: -50px !important;
+    }
+    .goslot-header .goslot-btn {
+      padding: 6px 12px !important;
+      font-size: 0.7rem !important;
+    }
+    .goslot-hero .goslot-btn {
+      width: 100% !important;
+    }
+    .goslot-header .fs-4 {
+      font-size: 1.1rem !important;
+    }
+    .goslot-header .gap-3 {
+      gap: 0.5rem !important;
+    }
+  }
 `;
 
 export default function Home() {
   const navigate = useNavigate();
   const [showRoleModal, setShowRoleModal] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState(null);
   const [cartCount, setCartCount] = useState(2);
   const [newsletterEmail, setNewsletterEmail] = useState("");
@@ -188,14 +221,31 @@ export default function Home() {
           </nav>
 
           <div className="d-flex align-items-center gap-3">
-            <button onClick={() => navigate("/login")} className="goslot-btn goslot-btn-outline py-1.5 px-3 fs-8">
+            <button onClick={() => navigate("/login")} className="goslot-btn goslot-btn-primary py-1.5 px-3 fs-8">
               Login
             </button>
             <button onClick={() => navigate("/login")} className="goslot-btn goslot-btn-primary py-1.5 px-3 fs-8">
-              <Rocket size={14} /> Start Selling
+              <Rocket size={14} className="d-none d-sm-block" /> Start Selling
+            </button>
+            
+            <button className="d-lg-none btn btn-light border-0 p-1 bg-transparent text-dark shadow-none" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
+
+        {/* Mobile Menu Dropdown */}
+        {isMobileMenuOpen && (
+          <div className="d-lg-none bg-white position-absolute w-100 border-bottom shadow-sm" style={{ top: "100%", left: 0 }}>
+            <nav className="d-flex flex-column p-4 gap-3 text-center">
+              <a href="#hero" className="goslot-nav-link fs-5" onClick={() => setIsMobileMenuOpen(false)}>Home</a>
+              <a href="#features" className="goslot-nav-link fs-5" onClick={() => setIsMobileMenuOpen(false)}>Features</a>
+              <a href="#stores" className="goslot-nav-link fs-5" onClick={() => setIsMobileMenuOpen(false)}>Stores</a>
+              <a href="#products" className="goslot-nav-link fs-5" onClick={() => setIsMobileMenuOpen(false)}>Catalog</a>
+              <a href="#pricing" className="goslot-nav-link fs-5" onClick={() => setIsMobileMenuOpen(false)}>Pricing</a>
+            </nav>
+          </div>
+        )}
       </header>
 
       {/* HERO */}
@@ -463,10 +513,10 @@ export default function Home() {
               <button onClick={() => setQuickViewProduct(null)} className="btn btn-sm btn-light rounded-circle">✕</button>
             </div>
             <div className="row g-3">
-              <div className="col-5">
+              <div className="col-12 col-sm-5">
                 <img src={quickViewProduct.img || quickViewProduct.image || "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400"} alt={quickViewProduct.name} className="w-100 rounded-3 object-cover shadow-sm" style={{ height: 140 }} />
               </div>
-              <div className="col-7 d-flex flex-column justify-between">
+              <div className="col-12 col-sm-7 d-flex flex-column justify-between mt-3 mt-sm-0">
                 <div>
                   <div className="fs-9 text-success fw-bolder mb-1">{quickViewProduct.store_name || "Aureum Merchant"}</div>
                   <div className="fs-5 fw-bolder text-dark mb-2">{quickViewProduct.price}</div>

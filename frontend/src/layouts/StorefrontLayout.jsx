@@ -1,5 +1,5 @@
-import React from 'react';
-import { Outlet, Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { Search, ShoppingCart, ChevronDown, User, LogOut } from 'lucide-react';
 import { useStorefrontCart } from '../context/StorefrontCartContext';
 import { useStorefrontAuth } from '../context/StorefrontAuthContext';
@@ -10,6 +10,9 @@ export default function StorefrontLayout({ storeData, categories = [], products 
   const { cartCount } = useStorefrontCart();
   const { user, logout } = useAuth();
   const { openLoginModal } = useStorefrontAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [searchQuery, setSearchQuery] = useState(new URLSearchParams(location.search).get('search') || '');
   
   const getBasePath = () => {
     const p = window.location.pathname;
@@ -83,8 +86,15 @@ export default function StorefrontLayout({ storeData, categories = [], products 
               type="text"
               placeholder={`Search for products, brands and more in ${storeData.name}`}
               className="storefront-search-input"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  navigate(`${basePath}?search=${encodeURIComponent(searchQuery)}`);
+                }
+              }}
             />
-            <button className="storefront-search-btn">
+            <button className="storefront-search-btn" onClick={() => navigate(`${basePath}?search=${encodeURIComponent(searchQuery)}`)}>
               <Search size={18} style={{ color: '#2874f0' }} />
             </button>
           </div>
