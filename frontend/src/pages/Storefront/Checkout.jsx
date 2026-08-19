@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStorefrontCart } from '../../context/StorefrontCartContext';
+import { useAuth } from '../../context/AuthContext';
 import { normalizeProductImage } from '../../utils/imageUtils';
 
 export default function Checkout() {
   const navigate = useNavigate();
   const { cartItems, cartTotal, clearCart, storeId } = useStorefrontCart();
+  const { user } = useAuth();
 
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
+    phone: '',
     address: '',
     city: '',
     zip: '',
@@ -49,7 +52,8 @@ export default function Checkout() {
     const orderPayload = {
       store_id: storeId,
       customer_name: formData.firstName,
-      customer_email: 'guest@example.com', // Default since email field was removed
+      customer_email: user?.email || 'guest@example.com', // Use logged-in user's email so it shows in My Orders
+      customer_phone: formData.phone,
       shipping_address: `${formData.address}, ${formData.city}`,
       payment_method: formData.paymentMethod,
       items: cartItems.map(item => ({
@@ -144,6 +148,10 @@ export default function Checkout() {
                 <div className="col-12">
                   <label className="form-label fs-8 text-secondary fw-semibold">Full Name</label>
                   <input type="text" className="form-control" name="firstName" required onChange={handleInputChange} />
+                </div>
+                <div className="col-12">
+                  <label className="form-label fs-8 text-secondary fw-semibold">Phone Number</label>
+                  <input type="tel" className="form-control" name="phone" required onChange={handleInputChange} />
                 </div>
                 <div className="col-12">
                   <label className="form-label fs-8 text-secondary fw-semibold">Street Address</label>

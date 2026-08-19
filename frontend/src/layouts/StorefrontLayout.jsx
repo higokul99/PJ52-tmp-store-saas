@@ -92,7 +92,14 @@ export default function StorefrontLayout({ storeData, categories = [], products 
           <div className="storefront-nav-actions">
             {user && user.id ? (
               <div className="d-flex align-items-center gap-3">
-                {/* User greeting and logout removed as requested */}
+                <span className="text-white fs-7 fw-semibold d-none d-md-block">Hello, {user.name}</span>
+                <button 
+                  className="btn bg-white fw-bold px-3 rounded-1 shadow-sm text-danger" 
+                  style={{ height: '36px', border: 'none' }}
+                  onClick={logout}
+                >
+                  Logout
+                </button>
               </div>
             ) : (
               <button 
