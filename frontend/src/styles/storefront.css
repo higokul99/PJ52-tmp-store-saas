@@ -9,6 +9,7 @@ html {
   background-color: #f1f3f6 !important;
   min-height: 100vh !important;
   color: #212121 !important;
+  overflow-x: hidden !important;
 }
 
 .storefront-app-root h1, 

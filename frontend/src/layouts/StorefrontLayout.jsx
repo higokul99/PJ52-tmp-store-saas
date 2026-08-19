@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { Search, ShoppingCart, ChevronDown, User, LogOut } from 'lucide-react';
+import { Search, ShoppingCart, ChevronDown, User, LogOut, Heart, Package } from 'lucide-react';
 import { useStorefrontCart } from '../context/StorefrontCartContext';
 import { useStorefrontAuth } from '../context/StorefrontAuthContext';
 import { useAuth } from '../context/AuthContext';
@@ -122,11 +122,13 @@ export default function StorefrontLayout({ storeData, categories = [], products 
             )}
 
             <Link to={`${basePath}/wishlist`} className="storefront-nav-item text-decoration-none">
-              Wishlist
+              <Heart size={18} />
+              <span>Wishlist</span>
             </Link>
 
             <Link to={`${basePath}/orders`} className="storefront-nav-item text-decoration-none">
-              My Orders
+              <Package size={18} />
+              <span>My Orders</span>
             </Link>
 
             <Link to={`${basePath}/cart`} className="storefront-nav-item cart-item text-decoration-none">
