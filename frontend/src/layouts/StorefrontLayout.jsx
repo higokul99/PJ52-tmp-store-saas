@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { Search, ShoppingCart, ChevronDown, User, LogOut, Heart, Package } from 'lucide-react';
+import { Search, ShoppingCart, ChevronDown, User, LogOut, Heart, Package, MoreVertical } from 'lucide-react';
 import { useStorefrontCart } from '../context/StorefrontCartContext';
 import { useStorefrontAuth } from '../context/StorefrontAuthContext';
 import { useAuth } from '../context/AuthContext';
@@ -13,6 +13,7 @@ export default function StorefrontLayout({ storeData, categories = [], products 
   const navigate = useNavigate();
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState(new URLSearchParams(location.search).get('search') || '');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   const getBasePath = () => {
     const p = window.location.pathname;
@@ -99,7 +100,8 @@ export default function StorefrontLayout({ storeData, categories = [], products 
             </button>
           </div>
 
-          <div className="storefront-nav-actions">
+          {/* DESKTOP NAV ACTIONS */}
+          <div className="storefront-nav-actions d-none d-lg-flex">
             {user && user.id ? (
               <div className="d-flex align-items-center gap-3">
                 <span className="text-white fs-7 fw-semibold d-none d-md-block">Hello, {user.name}</span>
@@ -142,6 +144,60 @@ export default function StorefrontLayout({ storeData, categories = [], products 
               </div>
               <span>Cart</span>
             </Link>
+          </div>
+
+          {/* MOBILE 3-DOT NAV MENU */}
+          <div className="d-flex d-lg-none align-items-center ms-auto position-relative">
+            {/* Minimal Mobile Cart Icon Outside Dropdown (Optional, but usually preferred) */}
+            <Link to={`${basePath}/cart`} className="text-white me-3 position-relative text-decoration-none d-flex align-items-center">
+               <ShoppingCart size={22} />
+               {cartCount > 0 && (
+                  <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style={{ fontSize: '0.6rem', transform: 'translate(-30%, -30%)!important' }}>
+                    {cartCount}
+                  </span>
+               )}
+            </Link>
+            
+            <button 
+              className="btn btn-link text-white p-0 border-0" 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              <MoreVertical size={24} />
+            </button>
+            
+            {isMobileMenuOpen && (
+              <div className="position-absolute bg-white shadow-lg rounded" style={{ top: '40px', right: '0', width: '220px', zIndex: 1000, overflow: 'hidden' }}>
+                 <div className="d-flex flex-column">
+                   {user && user.id && (
+                     <div className="text-dark fw-bold px-3 py-2 border-bottom fs-7 bg-light">Hello, {user.name}</div>
+                   )}
+                   <Link to={`${basePath}/wishlist`} className="d-flex align-items-center gap-3 px-3 py-2 text-dark text-decoration-none hover-bg-light" onClick={() => setIsMobileMenuOpen(false)}>
+                      <Heart size={16} className="text-secondary" /> Wishlist
+                   </Link>
+                   <Link to={`${basePath}/orders`} className="d-flex align-items-center gap-3 px-3 py-2 text-dark text-decoration-none hover-bg-light" onClick={() => setIsMobileMenuOpen(false)}>
+                      <Package size={16} className="text-secondary" /> My Orders
+                   </Link>
+                   
+                   <div className="border-top my-1"></div>
+                   
+                   {user && user.id ? (
+                     <button 
+                       className="d-flex align-items-center gap-3 px-3 py-2 text-danger w-100 border-0 bg-transparent text-start hover-bg-light" 
+                       onClick={() => { logout(); setIsMobileMenuOpen(false); }}
+                     >
+                       <LogOut size={16} /> Logout
+                     </button>
+                   ) : (
+                     <button 
+                       className="d-flex align-items-center gap-3 px-3 py-2 text-primary w-100 border-0 bg-transparent text-start fw-bold hover-bg-light" 
+                       onClick={() => { openLoginModal(); setIsMobileMenuOpen(false); }}
+                     >
+                       <User size={16} /> Login / Register
+                     </button>
+                   )}
+                 </div>
+              </div>
+            )}
           </div>
         </div>
       </header>

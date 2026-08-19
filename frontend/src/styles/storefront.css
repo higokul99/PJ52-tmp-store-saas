@@ -138,10 +138,13 @@ html {
 }
 
 .storefront-nav-actions {
-  display: flex;
   align-items: center;
   gap: 28px;
   margin-left: auto;
+}
+
+.hover-bg-light:hover {
+  background-color: #f8f9fa !important;
 }
 
 .storefront-login-btn {
