@@ -17,6 +17,7 @@ html {
   background-color: #f1f3f6 !important;
   min-height: 100vh !important;
   color: #212121 !important;
+  overflow-x: hidden !important;
 }
 
 .storefront-app-root h1, 
@@ -145,10 +146,13 @@ html {
 }
 
 .storefront-nav-actions {
-  display: flex;
   align-items: center;
   gap: 28px;
   margin-left: auto;
+}
+
+.hover-bg-light:hover {
+  background-color: #f8f9fa !important;
 }
 
 .storefront-login-btn {
