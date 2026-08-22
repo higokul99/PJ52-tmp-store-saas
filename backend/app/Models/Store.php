@@ -19,6 +19,7 @@ class Store extends Model
         'currency',
         'description',
         'status',
+        'category',
     ];
 
     public function user()

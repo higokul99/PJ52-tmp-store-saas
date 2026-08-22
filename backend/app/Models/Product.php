@@ -24,6 +24,11 @@ class Product extends Model
         'is_active',
         'color',
         'size',
+        'images',
+    ];
+
+    protected $casts = [
+        'images' => 'array',
     ];
 
     public function store()

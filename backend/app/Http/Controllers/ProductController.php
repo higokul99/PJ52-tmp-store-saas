@@ -62,6 +62,7 @@ class ProductController extends Controller
             'owner_email'     => 'nullable|string|max:255',
             'color'           => 'nullable|string|max:255',
             'size'            => 'nullable|string|max:255',
+            'images'          => 'nullable|array',
         ]);
 
         // Verify store_id actually exists — fall back to null if not found
@@ -97,6 +98,7 @@ class ProductController extends Controller
             'is_active'      => $validated['is_active'] ?? true,
             'color'          => $validated['color'] ?? null,
             'size'           => $validated['size'] ?? null,
+            'images'         => $validated['images'] ?? [],
         ]);
 
         return response()->json($product->load(['category', 'store']), 201);
@@ -129,6 +131,7 @@ class ProductController extends Controller
             'is_active' => 'nullable|boolean',
             'color' => 'nullable|string|max:255',
             'size' => 'nullable|string|max:255',
+            'images' => 'nullable|array',
         ]);
 
         if (isset($validated['name']) && $validated['name'] !== $product->name) {

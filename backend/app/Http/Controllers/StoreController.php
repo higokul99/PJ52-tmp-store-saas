@@ -41,6 +41,7 @@ class StoreController extends Controller
             'status'     => 'nullable|string',
             'user_id'    => 'nullable|integer',
             'slug'       => 'nullable|string|max:255',
+            'category'   => 'nullable|string|max:255',
         ]);
 
         // Resolve user_id: prefer authenticated user, then request user_id, then 1
@@ -68,6 +69,7 @@ class StoreController extends Controller
             'currency'   => $validated['currency'] ?? 'USD',
             'description'=> $validated['description'] ?? '',
             'status'     => $validated['status'] ?? 'Active',
+            'category'   => $validated['category'] ?? 'General Merchant Store',
         ]);
 
         return response()->json($store, 201);
@@ -95,6 +97,7 @@ class StoreController extends Controller
             'currency' => 'nullable|string|max:10',
             'description' => 'nullable|string',
             'status' => 'nullable|string',
+            'category' => 'nullable|string|max:255',
         ]);
 
         if (isset($validated['name']) && $validated['name'] !== $store->name) {
