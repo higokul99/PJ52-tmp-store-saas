@@ -1,3 +1,11 @@
+@import url('./theme-home.css');
+@import url('./theme-beauty.css');
+@import url('./theme-electronics.css');
+@import url('./theme-footwear.css');
+@import url('./theme-gift.css');
+@import url('./theme-grocery.css');
+@import url('./theme-jewelry.css');
+
 /* Storefront Specific CSS (Isolated from main Aureum CSS) */
 
 html {
@@ -515,3 +523,394 @@ html {
   }
 }
 
+/* ==========================================================================
+   Theme: Hexashop (Fashion & Apparel Overrides)
+   ========================================================================== */
+.theme-hexashop.storefront-body {
+  background-color: #ffffff !important;
+  font-family: 'Poppins', Roboto, Arial, sans-serif !important;
+}
+
+/* Hexashop Header */
+.hexashop-header {
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  height: 80px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.hexashop-header-content {
+  width: 100%;
+  max-width: 1248px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+  height: 100%;
+}
+
+.hexashop-logo {
+  flex-shrink: 0;
+}
+
+.hexashop-logo .storefront-logo-text {
+  font-family: 'Poppins', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #000000;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-style: normal;
+}
+
+.hexashop-nav {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.hexashop-nav-item {
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 600;
+  color: #000000;
+  text-transform: uppercase;
+  position: relative;
+  transition: all 0.3s;
+}
+
+.hexashop-nav-item:hover {
+  color: #000000;
+}
+
+.hexashop-nav-item::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  bottom: -4px;
+  left: 0;
+  background-color: #2a2a2a;
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.hexashop-nav-item:hover::after {
+  transform: scaleX(1);
+}
+
+.hexashop-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.hexashop-icon-btn {
+  color: #000000;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.hexashop-icon-btn:hover {
+  color: #777777;
+}
+
+/* Hexashop Hero Section */
+.hexashop-hero-section {
+  max-width: 1248px;
+  margin: 30px auto;
+  display: flex;
+  gap: 30px;
+  padding: 0 16px;
+}
+
+.hexashop-hero-left {
+  flex: 1;
+}
+
+.hexashop-hero-right {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 30px;
+}
+
+.hexashop-hero-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px; /* Smoother modern corners */
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  animation: fadeUp 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+/* Staggered animation delays for the grid */
+.hexashop-hero-left .hexashop-hero-item { animation-delay: 0.1s; }
+.hexashop-hero-right .hexashop-hero-item:nth-child(1) { animation-delay: 0.2s; }
+.hexashop-hero-right .hexashop-hero-item:nth-child(2) { animation-delay: 0.3s; }
+.hexashop-hero-right .hexashop-hero-item:nth-child(3) { animation-delay: 0.4s; }
+.hexashop-hero-right .hexashop-hero-item:nth-child(4) { animation-delay: 0.5s; }
+
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes liveBreathe {
+  0% { transform: scale(1) translate(0, 0); filter: brightness(0.9); }
+  50% { transform: scale(1.08) translate(-1%, -1%); filter: brightness(0.95); }
+  100% { transform: scale(1) translate(0, 0); filter: brightness(0.9); }
+}
+
+.hexashop-hero-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: filter 0.6s;
+  animation: liveBreathe 20s infinite ease-in-out;
+}
+
+/* Stagger the live animation durations/delays so they don't all move identically */
+.hexashop-hero-left .hexashop-hero-item img { animation-duration: 25s; animation-delay: 0s; }
+.hexashop-hero-right .hexashop-hero-item:nth-child(1) img { animation-duration: 18s; animation-delay: -2s; }
+.hexashop-hero-right .hexashop-hero-item:nth-child(2) img { animation-duration: 22s; animation-delay: -7s; }
+.hexashop-hero-right .hexashop-hero-item:nth-child(3) img { animation-duration: 20s; animation-delay: -12s; }
+.hexashop-hero-right .hexashop-hero-item:nth-child(4) img { animation-duration: 24s; animation-delay: -5s; }
+
+.hexashop-hero-item:hover img {
+  animation-play-state: paused;
+  filter: brightness(0.65) !important;
+}
+
+.hexashop-hero-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  padding: 35px 30px;
+  width: 85%;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.4);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.hexashop-hero-item:hover .hexashop-hero-content {
+  background: rgba(255, 255, 255, 0.95);
+  transform: translate(-50%, -50%) scale(1.02);
+}
+
+.hexashop-hero-content h2 {
+  font-size: 38px !important;
+  font-weight: 800 !important;
+  color: #1a1a1a !important;
+  margin-bottom: 12px !important;
+  letter-spacing: -0.5px;
+}
+
+.hexashop-hero-content span {
+  font-size: 15px;
+  color: #666666;
+  font-style: italic;
+  display: block;
+  margin-bottom: 25px;
+}
+
+.hexashop-btn {
+  background: linear-gradient(135deg, #2a2a2a 0%, #000000 100%);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 14px 28px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.hexashop-btn:hover {
+  background: linear-gradient(135deg, #111111 0%, #000000 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+.small-content {
+  padding: 15px;
+  width: auto;
+  min-width: 150px;
+}
+
+.small-content h4 {
+  font-size: 22px !important;
+  font-weight: 700 !important;
+  color: #2a2a2a !important;
+  margin-bottom: 5px !important;
+}
+
+.small-content span {
+  margin-bottom: 0;
+  font-size: 13px;
+}
+
+/* Hexashop Section Headers */
+.theme-hexashop .storefront-section-header {
+  border-bottom: none;
+  padding-bottom: 10px;
+  margin-bottom: 30px;
+  text-align: left;
+}
+
+.theme-hexashop .storefront-section-header h3 {
+  font-size: 34px !important;
+  font-weight: 700 !important;
+  color: #2a2a2a !important;
+}
+
+.theme-hexashop .storefront-view-all-btn {
+  display: none; /* Hexashop usually doesn't have a view all button in the header */
+}
+
+/* Hexashop Product Cards */
+.theme-hexashop .storefront-product-card {
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.theme-hexashop .storefront-product-card:hover {
+  box-shadow: 0 25px 50px rgba(0,0,0,0.1);
+  transform: translateY(-8px);
+  border-color: transparent;
+}
+
+.theme-hexashop .storefront-product-image-container {
+  background-color: #fcfcfc;
+  padding: 0;
+  height: 350px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  position: relative;
+  border-bottom: 1px solid #f9f9f9;
+}
+
+.theme-hexashop .storefront-product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.theme-hexashop .storefront-product-card:hover .storefront-product-image {
+  transform: scale(1.08);
+}
+
+.theme-hexashop .storefront-product-details {
+  padding: 0 15px 15px;
+}
+
+.theme-hexashop .storefront-product-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2a2a2a;
+  margin-bottom: 10px;
+}
+
+.theme-hexashop .storefront-product-price-row {
+  justify-content: center;
+}
+
+.theme-hexashop .storefront-product-price {
+  font-weight: 600;
+  font-size: 18px;
+  color: #2a2a2a;
+}
+
+.theme-hexashop .storefront-product-delivery,
+.theme-hexashop .storefront-product-rating {
+  display: none;
+}
+
+/* Hexashop Hover Actions */
+.theme-hexashop .hexashop-cart-wrapper {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 10;
+}
+
+.theme-hexashop .storefront-product-card:hover .hexashop-cart-wrapper {
+  transform: translateY(0);
+}
+
+.theme-hexashop .hexashop-cart-btn {
+  width: 100%;
+  background: linear-gradient(135deg, rgba(26,26,26,0.95) 0%, rgba(0,0,0,0.95) 100%) !important;
+  backdrop-filter: blur(4px);
+  color: #fff !important;
+  border: none;
+  border-radius: 0;
+  padding: 16px 0;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  transition: all 0.3s ease;
+}
+
+.theme-hexashop .hexashop-cart-btn:hover {
+  background: #000000 !important;
+  color: #d4af37 !important; /* Elegant gold accent on hover */
+}
+
+.theme-hexashop .storefront-product-heart {
+  display: none; /* Handled by absolute buttons in this theme or removed for cleanliness */
+}
+
+/* ==========================================================================
+   Responsive Design (Mobile & Tablet) - Hexashop Header
+   ========================================================================== */
+@media (max-width: 991px) {
+  .hexashop-header-content {
+    padding: 0 15px;
+  }
+  .hexashop-nav {
+    display: none; /* Hide full nav on smaller screens to prevent overflow */
+  }
+}
+
+@media (max-width: 768px) {
+  .hexashop-logo .storefront-logo-text {
+    font-size: 22px;
+  }
+  .hexashop-nav-actions {
+    gap: 12px;
+  }
+  .hexashop-icon-btn {
+    padding: 5px;
+  }
+  .hexashop-hero-section {
+    flex-direction: column;
+  }
+  .hexashop-hero-right {
+    grid-template-columns: 1fr;
+  }
+}

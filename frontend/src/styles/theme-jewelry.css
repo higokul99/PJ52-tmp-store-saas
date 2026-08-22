@@ -1,0 +1,148 @@
+/* ==========================================================================
+   Theme: Jewelry (Luxury)
+   ========================================================================== */
+.theme-jewelry.storefront-body {
+  background-color: #0a0a0a !important; /* Deep Midnight Black */
+  font-family: 'Playfair Display', serif !important;
+  color: #fff;
+}
+
+/* Jewelry Hero Section */
+.theme-jewelry .jewelry-hero-section {
+  position: relative;
+  width: 100%;
+  height: 80vh;
+  min-height: 600px;
+  overflow: hidden;
+  margin-bottom: 50px;
+}
+
+.theme-jewelry .jewelry-hero-bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: liveBreathe 30s infinite ease-in-out;
+}
+
+.theme-jewelry .jewelry-hero-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(to right, rgba(10,10,10,0.8) 0%, rgba(10,10,10,0.2) 100%);
+  z-index: 1;
+}
+
+.theme-jewelry .jewelry-hero-content {
+  position: absolute;
+  top: 50%;
+  left: 10%;
+  transform: translateY(-50%);
+  z-index: 2;
+  max-width: 600px;
+}
+
+.theme-jewelry .jewelry-hero-title {
+  font-size: 56px;
+  font-weight: 400;
+  color: #fff;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+  animation: fadeUp 1s ease-out forwards;
+}
+
+.theme-jewelry .jewelry-hero-subtitle {
+  font-size: 18px;
+  color: #d4af37; /* Gold */
+  margin-bottom: 40px;
+  font-style: italic;
+  animation: fadeUp 1.2s ease-out forwards;
+}
+
+.theme-jewelry .jewelry-btn {
+  background: transparent;
+  color: #d4af37;
+  border: 1px solid #d4af37;
+  padding: 15px 40px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  transition: all 0.4s ease;
+}
+
+.theme-jewelry .jewelry-btn:hover {
+  background: #d4af37;
+  color: #0a0a0a;
+}
+
+/* Jewelry Product Cards */
+.theme-jewelry .storefront-product-card {
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 0;
+  transition: all 0.4s ease;
+}
+
+.theme-jewelry .storefront-product-card:hover {
+  border-color: #d4af37;
+  box-shadow: 0 10px 30px rgba(212, 175, 55, 0.1);
+  transform: translateY(-5px);
+}
+
+.theme-jewelry .storefront-product-title {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+
+.theme-jewelry .storefront-product-price {
+  color: #d4af37;
+  font-size: 16px;
+}
+
+/* Add to Cart */
+.theme-jewelry .theme-cart-btn {
+  background: #d4af37 !important;
+  color: #0a0a0a !important;
+  border-radius: 0;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: all 0.3s ease;
+}
+
+.theme-jewelry .theme-cart-btn:hover {
+  background: #f1c40f !important;
+}
+
+/* Headers */
+.theme-jewelry .storefront-section-header h3 {
+  color: #d4af37 !important;
+  border-bottom: 1px solid #333;
+  padding-bottom: 10px;
+}
+
+/* ==========================================================================
+   Responsive Design (Mobile & Tablet)
+   ========================================================================== */
+@media (max-width: 991px) {
+  .theme-jewelry .jewelry-hero-title {
+    font-size: 40px;
+  }
+  .theme-jewelry .jewelry-hero-content {
+    left: 5%;
+    right: 5%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .theme-jewelry .jewelry-hero-section {
+    min-height: 400px;
+    height: 60vh;
+  }
+  .theme-jewelry .jewelry-hero-title {
+    font-size: 32px;
+  }
+  .theme-jewelry .jewelry-hero-subtitle {
+    font-size: 16px;
+  }
+}

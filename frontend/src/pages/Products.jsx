@@ -221,6 +221,8 @@ export default function Products() {
       stock_quantity: 15,
       image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80',
       description: '',
+      color: '',
+      size: '',
     });
     setShowModal(true);
   };
@@ -237,6 +239,8 @@ export default function Products() {
       stock_quantity: product.stock_quantity ?? 10,
       image: product.image || '',
       description: product.description || '',
+      color: product.color || '',
+      size: product.size || '',
     });
     setShowModal(true);
   };
@@ -269,6 +273,8 @@ export default function Products() {
       stock_quantity: stockVal,
       image: formData.image || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80',
       description: formData.description,
+      color: formData.color,
+      size: formData.size,
     };
 
     try {
@@ -483,7 +489,7 @@ export default function Products() {
       {/* Product Add/Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="w-full max-w-lg rounded-2xl p-6 relative border" style={{ background: '#0f0e0c', borderColor: `rgba(212,175,55,0.25)` }}>
+          <div className="w-full max-w-lg rounded-2xl p-6 relative border max-h-[90vh] overflow-y-auto custom-scrollbar" style={{ background: '#0f0e0c', borderColor: `rgba(212,175,55,0.25)` }}>
             <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 text-neutral-400 hover:text-white">
               <X size={18} />
             </button>
@@ -576,13 +582,83 @@ export default function Products() {
                 />
               </div>
 
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[11px] font-bold uppercase tracking-wider block mb-1.5" style={{ color: '#8a7a4d' }}>Colors</label>
+                  <div className="flex flex-wrap gap-1.5">
+                    {['Red', 'Blue', 'Green', 'Black', 'White', 'Grey', 'Pink', 'Yellow', 'Brown', 'Purple'].map(c => {
+                      const currentColors = formData.color ? formData.color.split(',').map(s=>s.trim()).filter(Boolean) : [];
+                      const isSelected = currentColors.includes(c);
+                      return (
+                        <button
+                          key={c}
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            if (isSelected) setFormData({...formData, color: currentColors.filter(x => x !== c).join(', ')});
+                            else setFormData({...formData, color: [...currentColors, c].join(', ')});
+                          }}
+                          className="text-[10px] px-2 py-1 rounded-full transition-colors"
+                          style={{
+                            background: isSelected ? GOLD : '#161310',
+                            color: isSelected ? INK : '#ffffff',
+                            border: `1px solid ${isSelected ? GOLD : 'rgba(212, 175, 55, 0.25)'}`
+                          }}
+                        >
+                          {c}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold uppercase tracking-wider block mb-1.5" style={{ color: '#8a7a4d' }}>Sizes</label>
+                  <div className="flex flex-wrap gap-1.5">
+                    {['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Free Size'].map(s => {
+                      const currentSizes = formData.size ? formData.size.split(',').map(x=>x.trim()).filter(Boolean) : [];
+                      const isSelected = currentSizes.includes(s);
+                      return (
+                        <button
+                          key={s}
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            if (isSelected) setFormData({...formData, size: currentSizes.filter(x => x !== s).join(', ')});
+                            else setFormData({...formData, size: [...currentSizes, s].join(', ')});
+                          }}
+                          className="text-[10px] px-2 py-1 rounded-md font-bold transition-colors"
+                          style={{
+                            background: isSelected ? GOLD : '#161310',
+                            color: isSelected ? INK : '#ffffff',
+                            border: `1px solid ${isSelected ? GOLD : 'rgba(212, 175, 55, 0.25)'}`
+                          }}
+                        >
+                          {s}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
               <div>
                 <label className="text-[11px] font-bold uppercase tracking-wider block mb-1.5" style={{ color: '#8a7a4d' }}>Description</label>
                 <textarea
                   rows={3}
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Traditional hand-carved solid brass oil lamps set of 2..."
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      setFormData({ ...formData, description: (formData.description || '') + '\n• ' });
+                    }
+                  }}
+                  onFocus={(e) => {
+                    if (!formData.description) {
+                      setFormData({ ...formData, description: '• ' });
+                    }
+                  }}
+                  placeholder="• Enter product description (press Enter for new bullet point)"
                   style={{ background: '#161310', color: '#ffffff', border: '1px solid rgba(212, 175, 55, 0.25)' }}
                   className="w-full p-3 rounded-xl text-sm outline-none"
                 />

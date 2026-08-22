@@ -17,11 +17,10 @@ export default function Checkout() {
     address: '',
     city: '',
     zip: '',
-    paymentMethod: 'cod'
+    paymentMethod: 'online'
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [orderSuccess, setOrderSuccess] = useState(false);
 
   const getBasePath = () => {
     const p = window.location.pathname;
@@ -29,97 +28,6 @@ export default function Checkout() {
     return '/storefront';
   };
   const basePath = getBasePath();
-
-  if (cartItems.length === 0 && !orderSuccess) {
-    return (
-      <div className="storefront-container py-5 text-center">
-        <h2>Your cart is empty</h2>
-        <button className="btn btn-primary mt-3" onClick={() => navigate(basePath)}>
-          Return to Store
-        </button>
-      </div>
-    );
-  }
-
-  const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    const orderPayload = {
-      store_id: storeId,
-      customer_name: formData.firstName,
-      customer_email: user?.email || 'guest@example.com', // Use logged-in user's email so it shows in My Orders
-      customer_phone: formData.phone,
-      shipping_address: `${formData.address}, ${formData.city}`,
-      payment_method: formData.paymentMethod,
-      items: cartItems.map(item => ({
-        product_id: item.id,
-        product_name: item.name,
-        price: item.price,
-        quantity: item.quantity
-      }))
-    };
-
-    try {
-      // Import api at the top if needed, but wait we need to import api first.
-      // I'll just use fetch or api from axios.
-      const { default: api } = await import('../../api/axios');
-      await api.post('/orders', orderPayload);
-    } catch (err) {
-      console.warn("Backend API failed, saving to local mock DB", err);
-      // Fallback to local storage for the dashboard
-      try {
-        const existing = JSON.parse(localStorage.getItem('aureum_owner_orders') || '[]');
-        const mockOrder = {
-          id: '#ORD-' + (Math.floor(Math.random() * 9000) + 1000),
-          store_id: storeId,
-          customer: orderPayload.customer_name,
-          email: orderPayload.customer_email,
-          total: cartTotal.toFixed(2),
-          status: 'Pending',
-          date: new Date().toISOString(),
-          items: cartItems.map(item => ({
-             product_id: item.id,
-             product_name: item.name,
-             product: item, 
-             price: item.price,
-             quantity: item.quantity,
-             image_url: item.image || item.image_url
-          }))
-        };
-        existing.unshift(mockOrder);
-        localStorage.setItem('aureum_owner_orders', JSON.stringify(existing));
-      } catch (e) {}
-    }
-
-    setIsSubmitting(false);
-    setOrderSuccess(true);
-    clearCart();
-  };
-
-
-  if (orderSuccess) {
-    return (
-      <div className="storefront-container py-5 text-center">
-        <div className="py-5 bg-white rounded shadow-sm border border-light max-w-lg mx-auto">
-          <div className="mb-4 d-flex justify-content-center">
-            <div className="bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style={{ width: 64, height: 64 }}>
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-            </div>
-          </div>
-          <h2 className="fs-3 font-bold mb-3">Order Placed Successfully!</h2>
-          <p className="text-secondary mb-4">Your order has been confirmed. You will receive an email shortly.</p>
-          <button className="btn btn-primary mt-3" onClick={() => navigate(basePath)}>
-            Continue Shopping
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   if (cartItems.length === 0) {
     return (
@@ -134,6 +42,15 @@ export default function Checkout() {
       </div>
     );
   }
+
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    navigate(`${basePath}/payment`, { state: { shippingData: formData } });
+  };
 
   return (
     <div className="storefront-container py-5">
@@ -165,60 +82,7 @@ export default function Checkout() {
             </form>
           </div>
 
-          <div className="bg-white rounded shadow-sm border border-light p-4">
-            <h3 className="fs-5 fw-bold mb-4">Payment Method</h3>
-            <div className="d-flex flex-column gap-3">
-              <label className={`border rounded p-3 cursor-pointer d-flex align-items-center gap-3 ${formData.paymentMethod === 'cod' ? 'border-primary bg-primary bg-opacity-10' : ''}`}>
-                <input 
-                  type="radio" 
-                  name="paymentMethod" 
-                  value="cod" 
-                  checked={formData.paymentMethod === 'cod'} 
-                  onChange={handleInputChange} 
-                  className="form-check-input mt-0"
-                />
-                <div>
-                  <div className="fw-bold fs-7 d-flex align-items-center gap-2">
-                    Cash on Delivery
-                  </div>
-                  <div className="fs-8 text-secondary">Pay with cash upon delivery</div>
-                </div>
-              </label>
-
-              <label className={`border rounded p-3 cursor-pointer d-flex align-items-center gap-3 ${formData.paymentMethod === 'online' ? 'border-primary bg-primary bg-opacity-10' : ''}`}>
-                <input 
-                  type="radio" 
-                  name="paymentMethod" 
-                  value="online" 
-                  checked={formData.paymentMethod === 'online'} 
-                  onChange={handleInputChange} 
-                  className="form-check-input mt-0"
-                />
-                <div>
-                  <div className="fw-bold fs-7">Credit Card / Online Payment</div>
-                  <div className="fs-8 text-secondary">Secure online payment (Simulated)</div>
-                </div>
-              </label>
-            </div>
-            {formData.paymentMethod === 'online' && (
-              <div className="mt-3 p-4 bg-light rounded border">
-                <div className="mb-3">
-                  <label className="form-label fs-8 text-secondary fw-semibold">Card Number</label>
-                  <input type="text" className="form-control" placeholder="0000 0000 0000 0000" maxLength="19" required={formData.paymentMethod === 'online'} />
-                </div>
-                <div className="row g-3">
-                  <div className="col-6">
-                    <label className="form-label fs-8 text-secondary fw-semibold">Expiry Date</label>
-                    <input type="text" className="form-control" placeholder="MM/YY" maxLength="5" required={formData.paymentMethod === 'online'} />
-                  </div>
-                  <div className="col-6">
-                    <label className="form-label fs-8 text-secondary fw-semibold">CVV</label>
-                    <input type="password" className="form-control" placeholder="123" maxLength="4" required={formData.paymentMethod === 'online'} />
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+          {/* Payment method selection removed, now happens on next page */}
         </div>
 
         <div className="col-lg-5">
@@ -270,24 +134,22 @@ export default function Checkout() {
                 form="checkout-form"
                 className="btn w-100 py-3 fw-bold text-white fs-6" 
                 style={{ backgroundColor: '#fb641b' }}
-                disabled={isSubmitting}
               >
-                {isSubmitting ? 'Processing...' : 'Place Order'}
+                Proceed to Payment
               </button>
-              
               <button 
                 type="button" 
                 className="btn w-100 py-3 fw-bold text-white fs-6 d-flex justify-content-center align-items-center gap-2" 
                 style={{ backgroundColor: '#25D366' }}
                 onClick={() => {
-                  const text = encodeURIComponent(`Hi, I would like to place an order for the following items:\n${cartItems.map(i => `- ${i.quantity}x ${i.name}`).join('\n')}\nTotal: $${cartTotal.toFixed(2)}`);
+                  const text = encodeURIComponent(`Hi, I would like to place an order for the following items:\n${cartItems.map(i => `- ${i.quantity}x ${i.name}`).join('\n')}\nTotal: ₹${cartTotal.toFixed(2)}`);
                   window.open(`https://wa.me/1234567890?text=${text}`, '_blank');
                 }}
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
                 </svg>
-                Buy via WhatsApp
+                Order via WhatsApp
               </button>
             </div>
           </div>

@@ -210,7 +210,7 @@ const normalizeProductImage = (rawUrl, productName = "") => {
   return cleanUrl;
 };
 
-const emptyProductForm = { name: "", sku: "", price: "", compare_price: "", discount_percentage: "", category: "Apparel", stock: "", image: "", color: "", size: "" };
+const emptyProductForm = { name: "", sku: "", price: "", compare_price: "", discount_percentage: "", category: "Apparel", stock: "", image: "", images: [], color: "", size: "" };
 
 export default function StoreOwnerDashboard() {
   const navigate = useNavigate();
@@ -232,7 +232,7 @@ export default function StoreOwnerDashboard() {
     const itemStoreName = String(item?.store_name || item?.store?.name || "").trim().toLowerCase();
     const itemStoreSlug = String(item?.store_slug || item?.store?.slug || item?.store?.subdomain || "").trim().toLowerCase();
 
-    const matchesStoreById = !storeId || !itemStoreId || String(itemStoreId) === String(storeId);
+    const matchesStoreById = Boolean(storeId && itemStoreId && String(itemStoreId) === String(storeId));
     const matchesStoreByName = Boolean(activeStoreName && itemStoreName && (
       activeStoreName === itemStoreName ||
       activeStoreName.includes(itemStoreName) ||
@@ -243,7 +243,12 @@ export default function StoreOwnerDashboard() {
       activeStoreSlug.includes(itemStoreSlug) ||
       itemStoreSlug.includes(activeStoreSlug)
     ));
-    const matchesStore = matchesStoreById || matchesStoreByName || matchesStoreBySlug || (!itemStoreId && !itemStoreName && !itemStoreSlug);
+    
+    // Strict fallback: if we have a specific storeId we're looking for, the item MUST match by ID, Name, or Slug.
+    // We no longer blindly accept items with missing store info if we are scoping to a specific store.
+    const matchesStore = storeId 
+      ? (matchesStoreById || matchesStoreByName || matchesStoreBySlug)
+      : (!itemStoreId && !itemStoreName && !itemStoreSlug);
 
     return (matchesUser || matchesEmail) && matchesStore;
   };
@@ -392,7 +397,8 @@ export default function StoreOwnerDashboard() {
     return [fallbackStore];
   }, [storesList, currentUserId, user]);
 
-  const activeStore = ownerStores.find((s) => s.id === selectedStoreId) || ownerStores[0];
+  const activeStore = ownerStores.find((s) => String(s.id) === String(selectedStoreId)) || ownerStores[0];
+  const currencySymbol = activeStore?.currency ? (activeStore.currency.match(/\((.*?)\)/)?.[1] || '$') : '$';
 
   const ownerMeta = useMemo(() => ({
     user_id: currentUserId ?? null,
@@ -431,6 +437,8 @@ export default function StoreOwnerDashboard() {
         }));
         if (filtered.length > 0) {
           setProductsList(filtered);
+        } else {
+          setProductsList([]);
         }
       }
     } catch (e) {
@@ -452,6 +460,8 @@ export default function StoreOwnerDashboard() {
         const filtered = parsed.filter((item) => matchesOwnerScope(item));
         if (filtered.length > 0) {
           setCategoriesList(filtered);
+        } else {
+          setCategoriesList([]);
         }
       }
     } catch (e) {
@@ -551,8 +561,8 @@ export default function StoreOwnerDashboard() {
             name: p.name,
             sku: p.sku || `SKU-${Math.floor(Math.random() * 900 + 100)}`,
             category: p.category?.name || p.category || "Uncategorized",
-            price: typeof p.price === "number" ? `$${p.price.toFixed(2)}` : p.price,
-            compare_price: typeof p.compare_price === "number" ? `$${p.compare_price.toFixed(2)}` : p.compare_price,
+            price: typeof p.price === "number" ? `${currencySymbol}${p.price.toFixed(2)}` : p.price,
+            compare_price: typeof p.compare_price === "number" ? `${currencySymbol}${p.compare_price.toFixed(2)}` : p.compare_price,
             stock: p.stock_quantity ?? 0,
             status: p.status || (p.stock_quantity > 0 ? "In Stock" : "Out of Stock"),
             image: p.image || getFallbackImageByName(p.name),
@@ -590,6 +600,8 @@ export default function StoreOwnerDashboard() {
             items: o.items || []
           }));
           setOrdersList(backendOrders);
+        } else {
+          setOrdersList([]);
         }
       } catch (err) {
         console.debug("Failed to load store orders from backend", err);
@@ -747,6 +759,7 @@ export default function StoreOwnerDashboard() {
         name: localPlaceholder.name,
         slug: localPlaceholder.slug,
         subdomain: localPlaceholder.subdomain,
+        category: storeForm.category,
         currency: storeForm.currency,
         description: localPlaceholder.description,
         owner_name: user?.name || user?.owner_name || '',
@@ -866,6 +879,8 @@ export default function StoreOwnerDashboard() {
             owner_email: currentOwnerEmail,
             store_id: category.store_id ?? activeStore?.id ?? null,
           })));
+        } else {
+          setCategoriesList([]);
         }
       } catch (err) {
         console.debug("API categories unavailable, keeping local categories", err);
@@ -1063,12 +1078,13 @@ export default function StoreOwnerDashboard() {
     setNewProd({
       name: product.name || "",
       sku: product.sku || "",
-      price: String(product.price || "").replace(/^\$/, ""),
-      compare_price: product.compare_price ? String(product.compare_price).replace(/^\$/, "") : "",
+      price: String(product.price || "").replace(/[^0-9.]/g, ""),
+      compare_price: product.compare_price ? String(product.compare_price).replace(/[^0-9.]/g, "") : "",
       discount_percentage: "",
       category: product.category || "Apparel",
       stock: product.stock_quantity ?? product.stock ?? "",
       image: product.image || "",
+      images: Array.isArray(product.images) ? product.images.map(img => typeof img === 'string' ? { url: img, color: '' } : img) : (product.image ? [{ url: product.image, color: '' }] : []),
       color: product.color || "",
       size: product.size || "",
     });
@@ -1113,7 +1129,8 @@ export default function StoreOwnerDashboard() {
       compare_price: newProd.compare_price ? Number(String(newProd.compare_price).replace(/[^0-9.]/g, "")) : null,
       stock_quantity: normalizedStock,
       description: newProd.description?.trim() || "",
-      image: normalizeProductImage(newProd.image, newProd.name),
+      image: normalizeProductImage(newProd.images?.[0]?.url || newProd.image, newProd.name),
+      images: newProd.images?.length > 0 ? newProd.images.map(img => ({ ...img, url: normalizeProductImage(img.url, newProd.name) })) : (newProd.image ? [{ url: normalizeProductImage(newProd.image, newProd.name), color: '' }] : []),
       is_active: true,
       store_name: activeStore?.name || ownerMeta.store_name || "Owner Store",
       store_slug: activeStore?.slug || ownerMeta.store_slug || activeStoreSlug,
@@ -1144,11 +1161,12 @@ export default function StoreOwnerDashboard() {
         name: p.name,
         sku: p.sku,
         category: p.category?.name || p.category || newProd.category,
-        price: typeof p.price === 'number' ? `$${p.price.toFixed(2)}` : p.price,
-        compare_price: typeof p.compare_price === 'number' ? `$${p.compare_price.toFixed(2)}` : p.compare_price,
+        price: typeof p.price === 'number' ? `${currencySymbol}${p.price.toFixed(2)}` : p.price,
+        compare_price: typeof p.compare_price === 'number' ? `${currencySymbol}${p.compare_price.toFixed(2)}` : p.compare_price,
         stock: p.stock_quantity ?? normalizedStock,
         status: p.status || status,
-        image: p.image || normalizeProductImage(newProd.image, newProd.name),
+        image: p.image || normalizeProductImage(newProd.images?.[0]?.url || newProd.image, newProd.name),
+        images: Array.isArray(p.images) && p.images.length > 0 ? p.images : (newProd.images?.length > 0 ? newProd.images : [{ url: p.image || normalizeProductImage(newProd.image, newProd.name), color: '' }]),
         color: p.color || newProd.color || null,
         size: p.size || newProd.size || null,
       };
@@ -1256,31 +1274,31 @@ export default function StoreOwnerDashboard() {
             Store Merchant
           </div>
 
-          {/* Active Store Indicator */}
-          {activeStore && (
-            <div
-              className="mx-2 mb-2 px-2 py-2 rounded-3 d-flex align-items-center justify-content-between gap-2"
-              style={{ background: "#ffffff", border: "1px solid #dfe3e8", cursor: "pointer" }}
-              onClick={() => setActive("stores")}
-              title="Click to manage store"
+          {/* Active Store Selector */}
+          <div className="mx-2 mb-3">
+            <label className="fs-9 fw-bold text-uppercase mb-1 ms-1" style={{ color: "#6d7175", letterSpacing: "0.05em" }}>Workspace</label>
+            <select
+              value={selectedStoreId || ""}
+              onChange={(e) => {
+                if (e.target.value === "CREATE_NEW") {
+                  openCreateStoreModal();
+                } else {
+                  setSelectedStoreId(e.target.value);
+                  localStorage.setItem('shopnest_active_store_id', e.target.value);
+                }
+              }}
+              className="form-select form-select-sm fw-bold fs-7 shadow-sm py-2"
+              style={{ background: "#ffffff", border: "1px solid #dfe3e8", color: "#202223", borderRadius: "8px", cursor: "pointer" }}
             >
-              <div className="d-flex align-items-center gap-2 min-w-0">
-                <div
-                  className="rounded-2 d-flex align-items-center justify-content-center flex-shrink-0 fs-8 fw-bold"
-                  style={{ width: 26, height: 26, background: "#e3f5f1", color: "#007f5f", border: "1px solid #c3e9df" }}
-                >
-                  {(activeStore.name || "S").charAt(0).toUpperCase()}
-                </div>
-                <div className="min-w-0">
-                  <div className="fs-8 fw-bold text-truncate" style={{ color: "#202223", maxWidth: 130 }}>{activeStore.name}</div>
-                  <div className="fs-9 fw-semibold" style={{ color: "#6d7175", fontFamily: "monospace", fontSize: "0.68rem" }}>ID #{activeStore.id}</div>
-                </div>
-              </div>
-              <span style={{ background: "#aee9d1", color: "#007f5f", padding: "1px 6px", borderRadius: "10px", fontSize: "0.65rem", fontWeight: 700, flexShrink: 0 }}>
-                {activeStore.status || "Active"}
-              </span>
-            </div>
-          )}
+              {ownerStores.map(store => (
+                <option key={store.id} value={store.id}>
+                  {store.name} (ID #{store.id})
+                </option>
+              ))}
+              <option disabled>──────────</option>
+              <option value="CREATE_NEW">+ Create New Store</option>
+            </select>
+          </div>
 
           {/* Nav List */}
           <nav className="d-flex flex-column gap-1">
@@ -2768,7 +2786,7 @@ export default function StoreOwnerDashboard() {
       {/* ADD PRODUCT MODAL */}
       {showAddProduct && (
         <div className="position-fixed top-0 bottom-0 start-0 end-0 bg-dark bg-opacity-75 d-flex align-items-center justify-content-center p-3" style={{ zIndex: 1050 }}>
-          <div className="bg-white rounded-3 shadow w-100 p-4" style={{ maxWidth: 460, border: "1px solid #dfe3e8" }}>
+          <div className="bg-white rounded-3 shadow w-100 p-4" style={{ maxWidth: 460, border: "1px solid #dfe3e8", maxHeight: "90vh", overflowY: "auto", overflowX: "hidden" }}>
             <div className="d-flex align-items-center justify-content-between mb-3 border-bottom pb-3" style={{ borderColor: "#dfe3e8" }}>
               <h3 className="fs-5 font-bold mb-0" style={{ color: "#202223" }}>{editingProduct ? `Edit Product` : "Add New Product"}</h3>
               <button onClick={closeProductModal} className="btn btn-sm p-0 border-0 bg-transparent" style={{ color: "#6d7175" }}>✕</button>
@@ -2781,11 +2799,11 @@ export default function StoreOwnerDashboard() {
               <div className="row g-2">
                 <div className="col-4">
                   <label className="mb-1 fs-8 fw-semibold" style={{ color: "#454f5b" }}>Price *</label>
-                  <input required value={newProd.price} onChange={(e) => setNewProd({ ...newProd, price: e.target.value })} className="form-control" style={{ border: "1px solid #dfe3e8", color: "#202223", backgroundColor: "#fafbfc" }} placeholder="$34.00" />
+                  <input required value={newProd.price} onChange={(e) => setNewProd({ ...newProd, price: e.target.value })} className="form-control" style={{ border: "1px solid #dfe3e8", color: "#202223", backgroundColor: "#fafbfc" }} placeholder={`${currencySymbol}34.00`} />
                 </div>
                 <div className="col-4">
                   <label className="mb-1 fs-8 fw-semibold" style={{ color: "#454f5b" }}>Original Price</label>
-                  <input value={newProd.compare_price || ''} onChange={(e) => setNewProd({ ...newProd, compare_price: e.target.value })} className="form-control" style={{ border: "1px solid #dfe3e8", color: "#202223", backgroundColor: "#fafbfc" }} placeholder="$50.00" />
+                  <input value={newProd.compare_price || ''} onChange={(e) => setNewProd({ ...newProd, compare_price: e.target.value })} className="form-control" style={{ border: "1px solid #dfe3e8", color: "#202223", backgroundColor: "#fafbfc" }} placeholder={`${currencySymbol}50.00`} />
                 </div>
                 <div className="col-4">
                   <label className="mb-1 fs-8 fw-semibold" style={{ color: "#454f5b" }}>Discount %</label>
@@ -2805,14 +2823,90 @@ export default function StoreOwnerDashboard() {
                   <label className="mb-1 fs-8 fw-semibold" style={{ color: "#454f5b" }}>Stock</label>
                   <input type="number" min="0" value={newProd.stock} onChange={(e) => setNewProd({ ...newProd, stock: e.target.value })} className="form-control" style={{ border: "1px solid #dfe3e8", color: "#202223", backgroundColor: "#fafbfc" }} placeholder="10" />
                 </div>
-                <div className="col-4">
-                  <label className="mb-1 fs-8 fw-semibold" style={{ color: "#454f5b" }}>Color</label>
-                  <input value={newProd.color || ''} onChange={(e) => setNewProd({ ...newProd, color: e.target.value })} className="form-control" style={{ border: "1px solid #dfe3e8", color: "#202223", backgroundColor: "#fafbfc" }} placeholder="e.g. Red" />
+                <div className="col-8">
+                  <div className="row g-2">
+                    <div className="col-12">
+                      <label className="mb-1 fs-8 fw-semibold" style={{ color: "#454f5b" }}>Colors</label>
+                      <div className="d-flex flex-wrap gap-1">
+                        {['Red', 'Blue', 'Green', 'Black', 'White', 'Grey', 'Pink', 'Yellow', 'Brown', 'Purple'].map(c => {
+                          const currentColors = newProd.color ? newProd.color.split(',').map(s=>s.trim()).filter(Boolean) : [];
+                          const isSelected = currentColors.includes(c);
+                          return (
+                            <button
+                              key={c}
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                if (isSelected) setNewProd({...newProd, color: currentColors.filter(x => x !== c).join(', ')});
+                                else setNewProd({...newProd, color: [...currentColors, c].join(', ')});
+                              }}
+                              className="btn btn-sm"
+                              style={{ 
+                                borderRadius: '12px', padding: '2px 8px', fontSize: '11px',
+                                background: isSelected ? '#1c2226' : '#fff',
+                                color: isSelected ? '#fff' : '#454f5b',
+                                border: `1px solid ${isSelected ? '#1c2226' : '#dfe3e8'}`
+                              }}
+                            >
+                              {c}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    <div className="col-12 mt-2">
+                      <label className="mb-1 fs-8 fw-semibold" style={{ color: "#454f5b" }}>Sizes</label>
+                      <div className="d-flex flex-wrap gap-1">
+                        {['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Free Size'].map(s => {
+                          const currentSizes = newProd.size ? newProd.size.split(',').map(x=>x.trim()).filter(Boolean) : [];
+                          const isSelected = currentSizes.includes(s);
+                          return (
+                            <button
+                              key={s}
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                if (isSelected) setNewProd({...newProd, size: currentSizes.filter(x => x !== s).join(', ')});
+                                else setNewProd({...newProd, size: [...currentSizes, s].join(', ')});
+                              }}
+                              className="btn btn-sm fw-bold"
+                              style={{ 
+                                borderRadius: '6px', padding: '2px 8px', fontSize: '11px', minWidth: '32px',
+                                background: isSelected ? '#1c2226' : '#fff',
+                                color: isSelected ? '#fff' : '#454f5b',
+                                border: `1px solid ${isSelected ? '#1c2226' : '#dfe3e8'}`
+                              }}
+                            >
+                              {s}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="col-4">
-                  <label className="mb-1 fs-8 fw-semibold" style={{ color: "#454f5b" }}>Size</label>
-                  <input value={newProd.size || ''} onChange={(e) => setNewProd({ ...newProd, size: e.target.value })} className="form-control" style={{ border: "1px solid #dfe3e8", color: "#202223", backgroundColor: "#fafbfc" }} placeholder="e.g. M" />
-                </div>
+              </div>
+              <div>
+                <label className="mb-1 fs-8 fw-semibold" style={{ color: "#454f5b" }}>Description</label>
+                <textarea
+                  value={newProd.description || ''}
+                  onChange={(e) => setNewProd({ ...newProd, description: e.target.value })}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      setNewProd({ ...newProd, description: (newProd.description || '') + '\n• ' });
+                    }
+                  }}
+                  onFocus={(e) => {
+                    if (!newProd.description) {
+                      setNewProd({ ...newProd, description: '• ' });
+                    }
+                  }}
+                  rows="3"
+                  className="form-control"
+                  style={{ border: "1px solid #dfe3e8", color: "#202223", backgroundColor: "#fafbfc" }}
+                  placeholder="• Enter product description (press Enter for new bullet point)"
+                />
               </div>
               <div>
                 <label className="mb-1 fs-8 fw-semibold" style={{ color: "#454f5b" }}>Category</label>
@@ -2833,37 +2927,70 @@ export default function StoreOwnerDashboard() {
                 </select>
               </div>
               <div>
-                <label className="mb-1 fs-8 fw-semibold" style={{ color: "#454f5b" }}>Product Image Upload</label>
+                <label className="mb-1 fs-8 fw-semibold" style={{ color: "#454f5b" }}>Product Images Upload (Multiple)</label>
                 <input
                   type="file"
+                  multiple
                   accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files[0];
-                    if (file) {
+                  onChange={async (e) => {
+                    const files = Array.from(e.target.files);
+                    if (!files.length) return;
+                    const readers = files.map(file => new Promise((resolve) => {
                       const reader = new FileReader();
-                      reader.onloadend = () => {
-                        setNewProd({ ...newProd, image: reader.result });
-                      };
+                      reader.onloadend = () => resolve(reader.result);
                       reader.readAsDataURL(file);
-                    }
+                    }));
+                    const results = await Promise.all(readers);
+                    const currentImages = newProd.images?.length > 0 ? newProd.images : (newProd.image ? [{ url: newProd.image, color: '' }] : []);
+                    const newImages = [...currentImages, ...results.map(url => ({ url, color: '' }))];
+                    setNewProd({ ...newProd, images: newImages, image: newImages[0]?.url || '' });
                   }}
                   className="form-control"
                   style={{ border: "1px solid #dfe3e8", color: "#202223", backgroundColor: "#fafbfc" }}
                 />
-                {newProd.image && (
-                  <div className="mt-2 d-flex align-items-center gap-2 p-2 rounded" style={{ background: "#f9fafb", border: "1px dashed #dfe3e8" }}>
-                    <img
-                      src={normalizeProductImage(newProd.image, newProd.name)}
-                      alt="Preview"
-                      className="rounded object-cover"
-                      style={{ width: 40, height: 40, border: "1px solid #dfe3e8" }}
-                      onError={(e) => {
-                        e.target.src = getFallbackImageByName(newProd.name);
-                      }}
-                    />
-                    <span className="fs-9 font-mono fw-semibold" style={{ color: "#007f5f" }}>✓ Image URL Preview</span>
-                  </div>
-                )}
+                
+                <div className="d-flex flex-wrap gap-3 mt-3">
+                  {(newProd.images?.length > 0 ? newProd.images : (newProd.image ? [{ url: newProd.image, color: '' }] : [])).map((imgObj, idx) => (
+                    <div key={idx} className="position-relative p-2 rounded d-flex flex-column align-items-center" style={{ background: "#f9fafb", border: "1px dashed #dfe3e8" }}>
+                      <img
+                        src={normalizeProductImage(imgObj.url, newProd.name)}
+                        alt={`Preview ${idx}`}
+                        className="rounded object-cover mb-2"
+                        style={{ width: 80, height: 80, border: "1px solid #dfe3e8" }}
+                        onError={(e) => { e.target.src = getFallbackImageByName(newProd.name); }}
+                      />
+                      {newProd.color && (
+                        <select 
+                          className="form-select form-select-sm" 
+                          style={{ fontSize: '0.75rem', padding: '0.1rem 1rem 0.1rem 0.4rem', minWidth: '80px' }}
+                          value={imgObj.color || ''}
+                          onChange={(e) => {
+                            const updatedImages = [...newProd.images];
+                            updatedImages[idx] = { ...updatedImages[idx], color: e.target.value };
+                            setNewProd({ ...newProd, images: updatedImages });
+                          }}
+                        >
+                          <option value="">No Color</option>
+                          {newProd.color.split(',').map(c => c.trim()).filter(Boolean).map(c => (
+                            <option key={c} value={c}>{c}</option>
+                          ))}
+                        </select>
+                      )}
+                      <button 
+                        type="button" 
+                        onClick={() => {
+                           const currentImages = newProd.images?.length > 0 ? newProd.images : (newProd.image ? [{ url: newProd.image, color: '' }] : []);
+                           const updated = currentImages.filter((_, i) => i !== idx);
+                           setNewProd({ ...newProd, images: updated, image: updated[0]?.url || '' });
+                        }}
+                        className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border-0" 
+                        style={{ padding: '0.2rem 0.4rem', cursor: 'pointer' }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
               <button type="submit" className="btn text-white w-100 mt-3 py-2 fw-bold" style={{ background: "#1c2226", borderRadius: "8px" }}>{editingProduct ? "Save Changes" : "Add Product"}</button>
             </form>
@@ -3098,9 +3225,13 @@ export default function StoreOwnerDashboard() {
                       style={{ border: "1px solid #dfe3e8", color: "#202223", backgroundColor: "#fafbfc" }}
                     >
                       <option value="Fashion & Apparel">Fashion & Apparel</option>
-                      <option value="Home & Living">Home & Living</option>
+                      <option value="Jewelry & Watches">Jewelry & Watches</option>
                       <option value="Beauty & Cosmetics">Beauty & Cosmetics</option>
-                      <option value="Jewelry & Luxury">Jewelry & Luxury</option>
+                      <option value="Home & Living">Home & Living</option>
+                      <option value="Electronics">Electronics</option>
+                      <option value="Footwear">Footwear</option>
+                      <option value="Grocery & Food">Grocery & Food</option>
+                      <option value="Gift Store">Gift Store</option>
                       <option value="General Retail">General Retail</option>
                     </select>
                   </div>
@@ -3216,9 +3347,13 @@ export default function StoreOwnerDashboard() {
                       style={{ border: "1px solid #dfe3e8", color: "#202223", backgroundColor: "#fafbfc" }}
                     >
                       <option value="Fashion & Apparel">Fashion & Apparel</option>
-                      <option value="Home & Living">Home & Living</option>
+                      <option value="Jewelry & Watches">Jewelry & Watches</option>
                       <option value="Beauty & Cosmetics">Beauty & Cosmetics</option>
-                      <option value="Jewelry & Luxury">Jewelry & Luxury</option>
+                      <option value="Home & Living">Home & Living</option>
+                      <option value="Electronics">Electronics</option>
+                      <option value="Footwear">Footwear</option>
+                      <option value="Grocery & Food">Grocery & Food</option>
+                      <option value="Gift Store">Gift Store</option>
                       <option value="General Retail">General Retail</option>
                     </select>
                   </div>

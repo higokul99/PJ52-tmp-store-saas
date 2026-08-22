@@ -1,0 +1,119 @@
+/* ==========================================================================
+   Theme: Electronics (Modern/Tech)
+   ========================================================================== */
+.theme-electronics.storefront-body {
+  background-color: #0d1117 !important; /* Tech Dark Mode */
+  font-family: 'Space Grotesk', 'Roboto', sans-serif !important;
+  color: #c9d1d9;
+}
+
+/* Tech Hero Section */
+.theme-electronics .tech-hero-section {
+  padding: 30px 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.theme-electronics .tech-hero-main {
+  position: relative;
+  width: 100%;
+  height: 600px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 0 40px rgba(0, 195, 255, 0.1);
+  border: 1px solid rgba(0, 195, 255, 0.2);
+}
+
+.theme-electronics .tech-hero-main img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s ease;
+}
+
+.theme-electronics .tech-hero-main:hover img {
+  transform: scale(1.05);
+}
+
+.theme-electronics .tech-hero-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(135deg, rgba(13,17,23,0.9) 0%, rgba(13,17,23,0.3) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px;
+}
+
+.theme-electronics .tech-hero-title {
+  font-size: 50px;
+  color: #fff;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-shadow: 0 0 20px rgba(0, 195, 255, 0.5);
+}
+
+.theme-electronics .tech-btn {
+  background: transparent;
+  color: #00c3ff;
+  border: 2px solid #00c3ff;
+  padding: 12px 30px;
+  font-weight: bold;
+  border-radius: 4px;
+  margin-top: 30px;
+  width: fit-content;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(0, 195, 255, 0.2);
+}
+
+.theme-electronics .tech-btn:hover {
+  background: #00c3ff;
+  color: #0d1117;
+  box-shadow: 0 0 20px rgba(0, 195, 255, 0.6);
+}
+
+/* Tech Product Cards */
+.theme-electronics .storefront-product-card {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 12px;
+  padding: 15px;
+  transition: all 0.3s ease;
+}
+
+.theme-electronics .storefront-product-card:hover {
+  border-color: #00c3ff;
+  box-shadow: 0 0 20px rgba(0, 195, 255, 0.15);
+  transform: translateY(-5px);
+}
+
+.theme-electronics .storefront-product-image-container {
+  background: #0d1117;
+  border-radius: 8px;
+}
+
+.theme-electronics .storefront-product-title {
+  color: #fff;
+  font-weight: 600;
+}
+
+.theme-electronics .storefront-product-price {
+  color: #00c3ff;
+  font-family: monospace;
+  font-size: 18px;
+}
+
+/* Add to Cart */
+.theme-electronics .theme-cart-btn {
+  background: #238636 !important; /* GitHub style green or Cyan */
+  background: linear-gradient(90deg, #00c3ff, #0055ff) !important;
+  color: #fff !important;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+.theme-electronics .theme-cart-btn:hover {
+  filter: brightness(1.2);
+}

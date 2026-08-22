@@ -1,14 +1,31 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ShoppingCart, Heart } from 'lucide-react';
 import { useStorefrontCart } from '../../context/StorefrontCartContext';
 import { useStorefrontAuth } from '../../context/StorefrontAuthContext';
+import { resolveStoreTheme } from '../../utils/themeResolver';
 import { normalizeProductImage } from '../../utils/imageUtils';
 
 export default function StorefrontHome({ storeData, products, categories = [] }) {
   const { requireAuth } = useStorefrontAuth();
   const location = useLocation();
   const searchQuery = new URLSearchParams(location.search).get('search')?.toLowerCase() || '';
+  const [eflyerSlide, setEflyerSlide] = useState(0);
+  const [aranozSlide, setAranozSlide] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setAranozSlide((prev) => (prev + 1) % 3);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const getBasePath = () => {
+    const p = window.location.pathname;
+    if (p.startsWith('/store/')) return `/store/${p.split('/')[2]}`;
+    return '/storefront';
+  };
+  const basePath = getBasePath();
   
   // Filter products by search query if it exists
   const filteredProducts = useMemo(() => {
@@ -19,8 +36,7 @@ export default function StorefrontHome({ storeData, products, categories = [] })
     );
   }, [products, searchQuery]);
 
-  // Determine if this is the apparel-focused store (Ajil Store)
-  const isApparelFocused = storeData?.name?.toLowerCase().includes('ajil') || storeData?.name?.toLowerCase().includes('apparel');
+  const theme = resolveStoreTheme(storeData);
 
   // Get unique category names from filteredProducts (default to 'Uncategorized' if missing)
   const productCategories = [];
@@ -87,7 +103,7 @@ export default function StorefrontHome({ storeData, products, categories = [] })
       <div className="storefront-product-grid">
         {items.map(product => (
           <div key={product.id} className="storefront-product-card position-relative">
-            <Link to={`/product/${product.id}`} className="text-decoration-none text-dark d-block">
+            <Link to={`${basePath}/product/${product.id}`} className="text-decoration-none text-dark d-block">
               <div className="storefront-product-image-container">
                 <img 
                   src={normalizeProductImage(product.image || product.image_url, product.name)} 
@@ -138,11 +154,11 @@ export default function StorefrontHome({ storeData, products, categories = [] })
               <Heart size={16} fill={isInWishlist(product.id) ? '#ff4757' : 'none'} color={isInWishlist(product.id) ? '#ff4757' : '#ced4da'} />
             </button>
 
-            {/* Add to Cart Button (absolute bottom) */}
-            <div className="position-absolute bottom-0 start-0 w-100 p-2" style={{ zIndex: 2 }}>
+            {/* Add to Cart Button */}
+            <div className={`add-to-cart-wrapper ${theme !== 'theme-default' ? 'theme-cart-wrapper' : 'position-absolute bottom-0 start-0 w-100 p-2'}`} style={{ zIndex: 2 }}>
               <button 
-                className="btn w-100 fw-bold d-flex align-items-center justify-content-center gap-2"
-                style={{ backgroundColor: '#ff9f00', color: '#fff', border: 'none', fontSize: '0.85rem', padding: '8px' }}
+                className={`btn w-100 fw-bold d-flex align-items-center justify-content-center gap-2 add-to-cart-btn ${theme !== 'theme-default' ? 'theme-cart-btn' : ''}`}
+                style={theme !== 'theme-default' ? {} : { backgroundColor: '#ff9f00', color: '#fff', border: 'none', fontSize: '0.85rem', padding: '8px' }}
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -165,14 +181,190 @@ export default function StorefrontHome({ storeData, products, categories = [] })
 
   return (
     <div className="storefront-home">
-      {/* Banner Carousel Placeholder */}
-      <div className="storefront-banner-slider">
-        <img 
-          src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1200&h=300&fit=crop" 
-          alt="Sale Banner" 
-          className="storefront-banner-img"
-        />
-      </div>
+      {(() => {
+        switch (theme) {
+          case 'theme-eflyer':
+            const eflyerSlides = [
+              {
+                bg: 'https://themewagon.github.io/eflyer/images/banner-bg.png',
+                title: 'GET START<br />YOUR FAVRIOT SHOPING',
+                btn: 'Buy Now'
+              },
+              {
+                bg: 'https://images.unsplash.com/photo-1617137968427-85924c800a22?w=1600&h=800&fit=crop',
+                title: 'NEW ARRIVALS<br />MEN\'S COLLECTION',
+                btn: 'Shop Men'
+              },
+              {
+                bg: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1600&h=800&fit=crop',
+                title: 'EXCLUSIVE OFFERS<br />UP TO 50% OFF',
+                btn: 'Explore Deals'
+              }
+            ];
+            const slide = eflyerSlides[eflyerSlide];
+            const nextSlide = () => setEflyerSlide((prev) => (prev + 1) % eflyerSlides.length);
+            const prevSlide = () => setEflyerSlide((prev) => (prev - 1 + eflyerSlides.length) % eflyerSlides.length);
+
+            return (
+              <div className="eflyer-hero" style={{ backgroundImage: `url(${slide.bg})` }}>
+                <button className="eflyer-slider-btn left" onClick={prevSlide}>
+                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <div className="eflyer-hero-content" key={eflyerSlide}>
+                  <h1 className="eflyer-hero-title" dangerouslySetInnerHTML={{ __html: slide.title }}></h1>
+                  <button className="eflyer-hero-btn">{slide.btn}</button>
+                </div>
+                <button className="eflyer-slider-btn right" onClick={nextSlide}>
+                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+              </div>
+            );
+          case 'theme-hexashop':
+            return (
+              <div className="hexashop-hero-section">
+                <div className="hexashop-hero-left">
+                  <div className="hexashop-hero-item large">
+                    <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&h=800&fit=crop" alt="Fashion" />
+                    <div className="hexashop-hero-content">
+                      <h2>We Are Hexashop</h2>
+                      <span>Awesome, clean &amp; creative fashion template</span>
+                      <button className="hexashop-btn">Purchase Now!</button>
+                    </div>
+                  </div>
+                </div>
+                <div className="hexashop-hero-right">
+                  <div className="hexashop-hero-item"><img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=400&fit=crop" alt="Women" /><div className="hexashop-hero-content small-content"><h4>Women</h4><span>Best Clothes</span></div></div>
+                  <div className="hexashop-hero-item"><img src="https://images.unsplash.com/photo-1617137968427-85924c800a22?w=400&h=400&fit=crop" alt="Men" /><div className="hexashop-hero-content small-content"><h4>Men</h4><span>Best Clothes</span></div></div>
+                  <div className="hexashop-hero-item"><img src="https://images.unsplash.com/photo-1514090458221-65bb69cf63e6?w=400&h=400&fit=crop" alt="Kids" /><div className="hexashop-hero-content small-content"><h4>Kids</h4><span>Best Clothes</span></div></div>
+                  <div className="hexashop-hero-item"><img src="https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=400&h=400&fit=crop" alt="Accessories" /><div className="hexashop-hero-content small-content"><h4>Accessories</h4><span>Trend Accessories</span></div></div>
+                </div>
+              </div>
+            );
+          case 'theme-jewelry':
+            return (
+              <div className="jewelry-hero-section">
+                <div className="jewelry-hero-overlay"></div>
+                <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1600&h=600&fit=crop" className="jewelry-hero-bg" alt="Jewelry" />
+                <div className="jewelry-hero-content">
+                  <h1 className="jewelry-hero-title">Timeless Elegance</h1>
+                  <p className="jewelry-hero-subtitle">Discover handcrafted luxury pieces that define sophistication.</p>
+                  <button className="jewelry-btn">Explore Collection</button>
+                </div>
+              </div>
+            );
+          case 'theme-beauty':
+            return (
+              <div className="beauty-hero-section">
+                <div className="beauty-hero-text">
+                  <span className="beauty-tag">NEW ARRIVALS</span>
+                  <h1 className="beauty-title">Pure. Natural. Flawless.</h1>
+                  <p className="beauty-subtitle">Elevate your skincare routine with our premium organic essentials.</p>
+                  <button className="beauty-btn">Shop Skincare</button>
+                </div>
+                <div className="beauty-hero-image-container">
+                  <img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=800&h=800&fit=crop" className="beauty-hero-img" alt="Cosmetics" />
+                </div>
+              </div>
+            );
+          case 'theme-home':
+            const aranozSlides = [
+              {
+                title: 'Wood & Cloth<br/>Sofa',
+                subtitle: 'Incididunt ut labore et dolore magna aliqua quis ipsum suspendisse ultrices gravida. Risus commodo viverra',
+                img: 'https://raw.githubusercontent.com/themewagon/aranoz/master/img/banner_img.png'
+              },
+              {
+                title: 'Premium Quality<br/>Furniture',
+                subtitle: 'Discover our new collection of comfortable and stylish living room furniture designed for modern homes.',
+                img: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&h=600&fit=crop'
+              },
+              {
+                title: 'Minimalist<br/>Living',
+                subtitle: 'Transform your space with our curated selection of minimalist decor and functional pieces.',
+                img: 'https://images.unsplash.com/photo-1540574163026-643ea20d25b5?w=600&h=600&fit=crop'
+              }
+            ];
+            const currentSlide = aranozSlides[aranozSlide];
+            
+            return (
+              <div className="aranoz-hero-section">
+                <div className="aranoz-hero-container" key={aranozSlide}>
+                  <div className="aranoz-hero-text animated">
+                    <h1 dangerouslySetInnerHTML={{ __html: currentSlide.title }}></h1>
+                    <p>{currentSlide.subtitle}</p>
+                    <button className="btn_2" onClick={() => {
+                        const el = document.getElementById('products');
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    }}>BUY NOW</button>
+                  </div>
+                  <div className="aranoz-hero-img animated">
+                    <img src={currentSlide.img} alt="Hero" style={{ borderRadius: '15px' }} />
+                  </div>
+                </div>
+              </div>
+            );
+          case 'theme-electronics':
+            return (
+              <div className="tech-hero-section">
+                <div className="tech-hero-grid">
+                  <div className="tech-hero-main">
+                    <div className="tech-hero-overlay">
+                      <h2 className="tech-hero-title">Next-Gen Tech</h2>
+                      <p>Experience the future of personal electronics.</p>
+                      <button className="tech-btn">Pre-Order Now</button>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1498049794561-7780e7231661?w=1200&h=600&fit=crop" alt="Tech" />
+                  </div>
+                </div>
+              </div>
+            );
+          case 'theme-footwear':
+            return (
+              <div className="footwear-hero-section">
+                <div className="footwear-hero-text">
+                  <h1 className="footwear-title">RUN<br/>FASTER.</h1>
+                  <p className="footwear-subtitle">Unleash your potential with our latest athletic collection.</p>
+                  <button className="footwear-btn">Shop Sneakers</button>
+                </div>
+                <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1000&h=800&fit=crop" className="footwear-hero-img" alt="Sneaker" />
+              </div>
+            );
+          case 'theme-grocery':
+            return (
+              <div className="grocery-hero-section">
+                <div className="grocery-hero-banner">
+                  <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=1600&h=500&fit=crop" alt="Fresh Groceries" />
+                  <div className="grocery-hero-content">
+                    <h2>Fresh & Organic</h2>
+                    <p>Farm-fresh produce delivered straight to your door.</p>
+                    <button className="grocery-btn">Shop Fresh</button>
+                  </div>
+                </div>
+              </div>
+            );
+          case 'theme-gift':
+            return (
+              <div className="gift-hero-section">
+                <div className="gift-hero-content">
+                  <h2>The Perfect Gift</h2>
+                  <p>Curated surprises for every special occasion.</p>
+                  <button className="gift-btn">Find Gifts</button>
+                </div>
+                <img src="https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=800&h=600&fit=crop" alt="Gifts" className="gift-hero-img" />
+              </div>
+            );
+          default:
+            return (
+              <div className="storefront-banner-slider">
+                <img 
+                  src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1200&h=300&fit=crop" 
+                  alt="Store Banner" 
+                  className="storefront-banner-img"
+                />
+              </div>
+            );
+        }
+      })()}
 
       {categoriesToRender.length > 0 ? (
         categoriesToRender.map(cat => {

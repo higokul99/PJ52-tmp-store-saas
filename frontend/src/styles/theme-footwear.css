@@ -1,0 +1,121 @@
+/* ==========================================================================
+   Theme: Footwear (Sporty)
+   ========================================================================== */
+.theme-footwear.storefront-body {
+  background-color: #f4f4f4 !important;
+  font-family: 'Anton', 'Impact', sans-serif !important;
+  color: #111;
+}
+
+/* Footwear Hero Section */
+.theme-footwear .footwear-hero-section {
+  display: flex;
+  background: #111;
+  min-height: 600px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 40px;
+}
+
+.theme-footwear .footwear-hero-text {
+  flex: 1;
+  padding: 80px 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  z-index: 2;
+}
+
+.theme-footwear .footwear-title {
+  font-size: 120px;
+  line-height: 0.9;
+  color: #ff4500; /* Neon Orange */
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  font-style: italic;
+}
+
+.theme-footwear .footwear-subtitle {
+  font-family: 'Roboto', sans-serif;
+  font-size: 18px;
+  color: #ccc;
+  margin-bottom: 40px;
+  max-width: 400px;
+}
+
+.theme-footwear .footwear-btn {
+  background: #ff4500;
+  color: #111;
+  border: none;
+  padding: 15px 40px;
+  font-size: 20px;
+  text-transform: uppercase;
+  font-style: italic;
+  font-weight: bold;
+  align-self: flex-start;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transform: skewX(-10deg);
+}
+
+.theme-footwear .footwear-btn:hover {
+  transform: skewX(-10deg) scale(1.05);
+  box-shadow: 0 10px 20px rgba(255, 69, 0, 0.4);
+}
+
+.theme-footwear .footwear-hero-img {
+  position: absolute;
+  right: -5%;
+  top: 50%;
+  transform: translateY(-50%) rotate(-15deg);
+  height: 120%;
+  width: auto;
+  object-fit: contain;
+  z-index: 1;
+  transition: transform 0.5s ease;
+}
+
+.theme-footwear .footwear-hero-section:hover .footwear-hero-img {
+  transform: translateY(-50%) rotate(-5deg) scale(1.05);
+}
+
+/* Footwear Product Cards */
+.theme-footwear .storefront-product-card {
+  background: #fff;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+  transform: skewX(-3deg);
+  padding: 10px;
+}
+
+.theme-footwear .storefront-product-card:hover {
+  border-color: #ff4500;
+  transform: skewX(-3deg) translateY(-10px);
+  box-shadow: 10px 10px 0px #ff4500;
+}
+
+.theme-footwear .storefront-product-image-container {
+  background: #eee;
+  transform: skewX(3deg); /* counteract card skew for image */
+}
+
+.theme-footwear .storefront-product-title {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  font-size: 20px;
+}
+
+/* Add to Cart */
+.theme-footwear .theme-cart-btn {
+  background: #111 !important;
+  color: #fff !important;
+  font-family: 'Anton', sans-serif;
+  font-size: 18px;
+  text-transform: uppercase;
+  transform: skewX(-5deg);
+}
+
+.theme-footwear .theme-cart-btn:hover {
+  background: #ff4500 !important;
+}

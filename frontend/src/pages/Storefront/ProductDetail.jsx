@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ShoppingCart, Heart, ArrowLeft, ArrowRight, Zap } from 'lucide-react';
+import { ShoppingCart, Heart, ArrowLeft, ArrowRight, Zap, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useStorefrontCart } from '../../context/StorefrontCartContext';
 import { useStorefrontAuth } from '../../context/StorefrontAuthContext';
 import { normalizeProductImage } from '../../utils/imageUtils';
@@ -62,12 +62,77 @@ export default function ProductDetail({ storeData, products }) {
     ? String(product.color).split(',').map(c => c.trim()).filter(Boolean)
     : [];
 
-  // Set default color
+  const parsedImages = React.useMemo(() => {
+    let imgs = [];
+    if (typeof product.images === 'string') {
+      try { imgs = JSON.parse(product.images); } catch(e) {}
+    } else if (Array.isArray(product.images)) {
+      imgs = product.images;
+    }
+    
+    let normalizedImgs = imgs.map(img => typeof img === 'string' ? { url: img, color: '' } : img);
+    
+    const colors = product.color ? String(product.color).split(',').map(c => c.trim()).filter(Boolean) : [];
+    
+    if (colors.length > 0) {
+      const finalImgs = [];
+      colors.forEach(color => {
+        const specificImg = normalizedImgs.find(img => img.color && img.color.toLowerCase() === color.toLowerCase());
+        if (specificImg) {
+          finalImgs.push(specificImg);
+        } else {
+          const baseImgUrl = normalizedImgs.length > 0 ? normalizedImgs[0].url : (product.image || product.image_url);
+          finalImgs.push({ url: baseImgUrl, color: color });
+        }
+      });
+      // Add any uncolored images
+      normalizedImgs.forEach(img => {
+        if (!img.color && !finalImgs.some(f => f.url === img.url)) {
+          finalImgs.push(img);
+        }
+      });
+      return finalImgs;
+    }
+    
+    if (normalizedImgs.length === 0) {
+      return [{ url: product.image || product.image_url, color: '' }];
+    }
+    
+    return normalizedImgs;
+  }, [product.images, product.color, product.image, product.image_url]);
+
+  const [activeImage, setActiveImage] = React.useState('');
+  const [isFading, setIsFading] = React.useState(false);
+
+  const changeImageWithFade = (newUrl, newColorObj) => {
+    if (normalizeProductImage(newUrl, product.name) === activeImage) return;
+    setIsFading(true);
+    setTimeout(() => {
+      setActiveImage(normalizeProductImage(newUrl, product.name));
+      if (newColorObj) {
+        const match = productColors.find(c => c.toLowerCase().trim() === newColorObj.toLowerCase().trim());
+        if (match) setSelectedColor(match);
+      }
+      setIsFading(false);
+    }, 150);
+  };
+
+  React.useEffect(() => {
+    setActiveImage(normalizeProductImage(parsedImages[0]?.url || product.image || product.image_url, product.name));
+  }, [product.id, parsedImages, product.image, product.image_url, product.name]);
+
+  // Set default color and handle image sync
   React.useEffect(() => {
     if (productColors.length > 0 && !selectedColor) {
       setSelectedColor(productColors[0]);
     }
-  }, [productColors, selectedColor]);
+    if (selectedColor && parsedImages.length > 0) {
+      const match = parsedImages.find(img => img.color && img.color.toLowerCase().trim() === selectedColor.toLowerCase().trim());
+      if (match) {
+        setActiveImage(normalizeProductImage(match.url, product.name));
+      }
+    }
+  }, [productColors, selectedColor, parsedImages, product.name]);
 
   const handleAddToCart = () => {
     requireAuth(() => addToCart({ ...product, selectedSize, selectedColor }, 1));
@@ -78,6 +143,22 @@ export default function ProductDetail({ storeData, products }) {
       addToCart({ ...product, selectedSize, selectedColor }, 1);
       navigate(`${basePath}/checkout`);
     });
+  };
+
+  const handleNextImage = () => {
+    if (parsedImages.length <= 1) return;
+    const currentIndex = parsedImages.findIndex(img => normalizeProductImage(img.url, product.name) === activeImage);
+    const nextIndex = (currentIndex + 1) % parsedImages.length;
+    const nextImg = parsedImages[nextIndex];
+    changeImageWithFade(nextImg.url, nextImg.color);
+  };
+
+  const handlePrevImage = () => {
+    if (parsedImages.length <= 1) return;
+    const currentIndex = parsedImages.findIndex(img => normalizeProductImage(img.url, product.name) === activeImage);
+    const prevIndex = (currentIndex - 1 + parsedImages.length) % parsedImages.length;
+    const prevImg = parsedImages[prevIndex];
+    changeImageWithFade(prevImg.url, prevImg.color);
   };
 
   return (
@@ -91,16 +172,53 @@ export default function ProductDetail({ storeData, products }) {
 
       <div className="row g-5">
         <div className="col-md-6">
-          <div className="product-image-container p-4 bg-white rounded-3 shadow-sm border border-light text-center h-100 d-flex align-items-center justify-content-center position-relative">
+          <div className="product-image-container p-4 bg-white rounded-3 shadow-sm border border-light text-center h-100 d-flex flex-column align-items-center justify-content-center position-relative">
+            {parsedImages.length > 1 && (
+              <button 
+                className="btn position-absolute start-0 top-50 translate-middle-y m-2 rounded-circle shadow-sm bg-white"
+                style={{ width: '40px', height: '40px', padding: '0', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10, color: '#333' }}
+                onClick={handlePrevImage}
+              >
+                <ChevronLeft size={20} />
+              </button>
+            )}
             <img 
-              src={normalizeProductImage(product.image || product.image_url, product.name)} 
+              src={activeImage} 
               alt={product.name} 
               className="img-fluid rounded" 
-              style={{ maxHeight: '500px', objectFit: 'contain' }}
+              style={{ maxHeight: '400px', objectFit: 'contain', transition: 'all 0.15s ease-in-out', opacity: isFading ? 0 : 1, transform: isFading ? 'scale(0.98)' : 'scale(1)' }}
             />
+            {parsedImages.length > 1 && (
+              <button 
+                className="btn position-absolute end-0 top-50 translate-middle-y m-2 rounded-circle shadow-sm bg-white"
+                style={{ width: '40px', height: '40px', padding: '0', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10, color: '#333' }}
+                onClick={handleNextImage}
+              >
+                <ChevronRight size={20} />
+              </button>
+            )}
+            {parsedImages.length > 0 && (
+              <div className="d-flex flex-wrap gap-2 mt-4 justify-content-center w-100">
+                {parsedImages.map((img, idx) => {
+                  const imgUrl = normalizeProductImage(img.url, product.name);
+                  return (
+                    <div 
+                      key={idx} 
+                      className={`border rounded p-1 ${activeImage === imgUrl ? 'border-primary shadow-sm' : 'border-light opacity-75'}`}
+                      style={{ width: '60px', height: '60px', cursor: 'pointer', transition: 'all 0.2s' }}
+                      onClick={() => {
+                        changeImageWithFade(img.url, img.color);
+                      }}
+                    >
+                      <img src={imgUrl} alt="Thumbnail" className="w-100 h-100 rounded" style={{ objectFit: 'cover' }} />
+                    </div>
+                  );
+                })}
+              </div>
+            )}
             <button 
               className="btn position-absolute top-0 end-0 m-3 rounded-circle shadow-sm bg-white"
-              style={{ width: '40px', height: '40px', padding: '0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: inWishlist ? '#ff4757' : '#ced4da' }}
+              style={{ width: '40px', height: '40px', padding: '0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: inWishlist ? '#ff4757' : '#ced4da', zIndex: 10 }}
               onClick={() => requireAuth(() => toggleWishlist(product))}
             >
               <Heart size={20} fill={inWishlist ? '#ff4757' : 'none'} />
@@ -136,9 +254,27 @@ export default function ProductDetail({ storeData, products }) {
               )}
             </div>
 
-            <p className="text-secondary fs-6 mb-4 lh-lg">
-              {product.description || 'This premium product is part of our exclusive collection. Crafted with the finest materials and designed to exceed your expectations. Experience the perfect blend of style and functionality.'}
-            </p>
+            {(() => {
+              const desc = product.description || 'This premium product is part of our exclusive collection. Crafted with the finest materials and designed to exceed your expectations. Experience the perfect blend of style and functionality.';
+              // Split by bullet characters or newlines
+              const lines = desc.split(/•|\n/).map(line => line.trim()).filter(line => line.length > 0);
+              
+              if (lines.length > 1) {
+                return (
+                  <ul className="text-secondary fs-6 mb-4 lh-lg ps-4" style={{ listStyleType: 'disc' }}>
+                    {lines.map((line, idx) => (
+                      <li key={idx} className="mb-2">{line}</li>
+                    ))}
+                  </ul>
+                );
+              }
+              
+              return (
+                <p className="text-secondary fs-6 mb-4 lh-lg">
+                  {desc}
+                </p>
+              );
+            })()}
 
             <div className="mb-4">
               <div className="d-flex justify-content-between align-items-center mb-2">
@@ -191,33 +327,20 @@ export default function ProductDetail({ storeData, products }) {
             <div className="d-flex flex-column gap-3 mb-5">
               <div className="d-flex gap-3">
                 <button 
-                  className="btn btn-lg fw-bold d-flex align-items-center justify-content-center gap-2 flex-grow-1"
-                  style={{ backgroundColor: '#ff9f00', color: '#fff', border: 'none' }}
+                  className="btn btn-lg fw-bold d-flex align-items-center justify-content-center gap-2 flex-grow-1 py-3"
+                  style={{ backgroundColor: '#ff9f00', color: '#fff', border: 'none', borderRadius: '8px' }}
                   onClick={handleAddToCart}
                 >
                   <ShoppingCart size={20} /> Add to Cart
                 </button>
                 <button 
-                  className="btn btn-lg fw-bold d-flex align-items-center justify-content-center gap-2 flex-grow-1"
-                  style={{ backgroundColor: '#fb641b', color: '#fff', border: 'none' }}
+                  className="btn btn-lg fw-bold d-flex align-items-center justify-content-center gap-2 flex-grow-1 py-3"
+                  style={{ backgroundColor: '#fb641b', color: '#fff', border: 'none', borderRadius: '8px' }}
                   onClick={handleBuyNow}
                 >
                   <Zap size={20} /> Buy Now
                 </button>
               </div>
-              <button 
-                className="btn btn-lg fw-bold d-flex align-items-center justify-content-center gap-2 w-100"
-                style={{ backgroundColor: '#25D366', color: '#fff', border: 'none' }}
-                onClick={() => {
-                  const text = encodeURIComponent(`Hi, I would like to buy: ${product.name}\nPrice: $${product.price}`);
-                  window.open(`https://wa.me/1234567890?text=${text}`, '_blank');
-                }}
-              >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
-                </svg>
-                Buy via WhatsApp
-              </button>
             </div>
 
             <div className="border-top pt-4">

@@ -1,0 +1,468 @@
+/* Eflyer Theme Styling */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap');
+
+.theme-eflyer {
+  font-family: 'Poppins', sans-serif;
+  background-color: #f8f9fa;
+  color: #2b2a29;
+}
+
+.theme-eflyer .eflyer-welcome-text {
+  color: #ffffff !important;
+}
+
+/* Header Wrapper - ensures the orange background covers the whole header area */
+.theme-eflyer .eflyer-banner-wrapper {
+  background-image: url('https://themewagon.github.io/eflyer/images/banner-bg.png'); /* Or a similar vibrant yellow/orange gradient image */
+  background-color: #eab41f; /* Fallback */
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  z-index: 10;
+}
+
+/* Let's actually put the background on the eflyer-hero and pull it up under the header */
+.theme-eflyer .eflyer-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+}
+
+.theme-eflyer .eflyer-top-bar {
+  background-color: transparent;
+  color: #fff;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.theme-eflyer .eflyer-top-bar-content {
+  background-color: #2b2b2b;
+  padding: 15px 40px;
+  clip-path: polygon(5% 0, 95% 0, 100% 100%, 0% 100%);
+  display: inline-flex;
+}
+
+.theme-eflyer .eflyer-top-nav {
+  display: flex;
+  gap: 30px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.theme-eflyer .eflyer-top-nav a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.theme-eflyer .eflyer-top-nav a:hover {
+  color: #f26522;
+}
+
+.theme-eflyer .eflyer-middle-bar {
+  background-color: transparent;
+  padding: 30px 0 20px;
+  text-align: center;
+}
+
+.theme-eflyer .eflyer-logo {
+  font-size: 48px;
+  font-weight: 700;
+  color: #fff;
+  text-decoration: none;
+  display: inline-block;
+  line-height: 1;
+}
+
+.theme-eflyer .eflyer-bottom-bar {
+  background-color: transparent;
+  padding: 10px 0;
+}
+
+.theme-eflyer .eflyer-bottom-bar-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.theme-eflyer .eflyer-hamburger-btn {
+  background: transparent;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.theme-eflyer .eflyer-hamburger-icon {
+  width: 35px;
+  height: 4px;
+  background-color: #fff;
+}
+
+.theme-eflyer .eflyer-cat-btn {
+  background-color: #2b2b2b;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.theme-eflyer .eflyer-search-container {
+  display: flex;
+  width: 500px;
+  background: #fff;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.theme-eflyer .eflyer-search-input {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  outline: none;
+  color: #333;
+}
+
+.theme-eflyer .eflyer-search-btn {
+  background: #f26522;
+  color: #fff;
+  border: none;
+  padding: 0 20px;
+  cursor: pointer;
+}
+
+.theme-eflyer .eflyer-lang-btn {
+  background: #fff;
+  color: #333;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.theme-eflyer .eflyer-actions {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  margin-left: 20px;
+}
+
+.theme-eflyer .eflyer-action-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+
+/* Hero Section */
+.theme-eflyer .eflyer-hero {
+  /* Using a generic gradient or image similar to the screenshot if we don't have the exact asset */
+  background: #eab41f url('https://themewagon.github.io/eflyer/images/banner-bg.png') no-repeat center center;
+  background-size: cover;
+  position: relative;
+  /* Add top padding to account for the absolute positioned header */
+  padding-top: 250px; 
+  padding-bottom: 120px;
+  text-align: center;
+  animation: bgPan 20s linear infinite alternate;
+}
+
+@keyframes bgPan {
+  0% { background-position: left center; }
+  100% { background-position: right center; }
+}
+
+.theme-eflyer .eflyer-hero-content {
+  max-width: 900px;
+  margin: 0 auto;
+  color: #fff;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: liveFloat 4s ease-in-out infinite;
+}
+
+@keyframes liveFloat {
+  0% { transform: translateX(-15px); }
+  50% { transform: translateX(15px); }
+  100% { transform: translateX(-15px); }
+}
+
+.theme-eflyer .eflyer-hero-title {
+  font-size: 70px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 40px;
+  line-height: 1.1;
+  color: #ffffff !important;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.theme-eflyer .eflyer-hero-btn {
+  background: #2b2a29;
+  color: #fff;
+  padding: 15px 40px;
+  font-size: 18px;
+  font-weight: 700;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: background 0.3s;
+}
+
+.theme-eflyer .eflyer-hero-btn:hover {
+  background: #fff;
+  color: #2b2a29;
+}
+
+/* Slider Controls for Hero */
+.theme-eflyer .eflyer-slider-btn {
+  position: absolute;
+  top: 60%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  background-color: rgba(255,255,255,0.7);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  color: #333;
+  cursor: pointer;
+  z-index: 5;
+}
+
+.theme-eflyer .eflyer-slider-btn.left { left: 50px; }
+.theme-eflyer .eflyer-slider-btn.right { right: 50px; }
+
+/* Non-home pages need margin-top so content isn't under header */
+.theme-eflyer .storefront-main-content {
+  padding-top: 0; 
+  max-width: 100%;
+  margin: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+.theme-eflyer:not(.is-home) .storefront-main-content {
+  background-color: #f8f9fa;
+}
+
+
+/* Products Section */
+.theme-eflyer .storefront-section {
+  max-width: 1200px;
+  margin: 60px auto;
+  padding: 0 20px;
+}
+
+.theme-eflyer .storefront-section-header {
+  text-align: center;
+  margin-bottom: 40px;
+  display: block;
+}
+
+.theme-eflyer .storefront-section-header h3 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #2b2a29;
+  text-transform: uppercase;
+  position: relative;
+  display: inline-block;
+  padding-bottom: 10px;
+}
+
+.theme-eflyer .storefront-section-header h3::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: #f26522;
+}
+
+.theme-eflyer .storefront-view-all-btn {
+  display: none; 
+}
+
+.theme-eflyer .storefront-product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 30px;
+}
+
+.theme-eflyer .storefront-product-card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 0;
+  box-shadow: 0 0 15px rgba(0,0,0,0.05);
+  text-align: center;
+  transition: all 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.theme-eflyer .storefront-product-card:hover {
+  box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+  transform: translateY(-8px);
+}
+
+.theme-eflyer .storefront-product-image-container {
+  height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.theme-eflyer .storefront-product-image {
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.theme-eflyer .storefront-product-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #2b2a29;
+  margin-bottom: 10px;
+}
+
+.theme-eflyer .storefront-product-price-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.theme-eflyer .storefront-product-price {
+  font-size: 18px;
+  font-weight: 700;
+  color: #f26522;
+}
+
+.theme-eflyer .theme-cart-wrapper {
+  position: static;
+  margin-top: auto;
+  padding-top: 15px;
+}
+
+.theme-eflyer .theme-cart-btn {
+  background: #2b2a29;
+  color: #fff;
+  border: none;
+  padding: 10px;
+  text-transform: uppercase;
+  font-size: 14px;
+  border-radius: 4px;
+  transition: background 0.3s;
+}
+
+.theme-eflyer .theme-cart-btn:hover {
+  background: #f26522;
+}
+
+/* ==========================================================================
+   Responsive Design (Mobile & Tablet)
+   ========================================================================== */
+@media (max-width: 991px) {
+  .theme-eflyer .eflyer-bottom-bar-content {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 15px;
+  }
+  
+  .theme-eflyer .eflyer-category-dropdown {
+    flex: 0 0 auto;
+  }
+  
+  .theme-eflyer .eflyer-actions {
+    flex: 0 0 auto;
+    margin-left: 0;
+    gap: 20px;
+  }
+  
+  .theme-eflyer .eflyer-search-container {
+    width: 100%;
+    max-width: 100%;
+    order: 3;
+  }
+  
+  .theme-eflyer .eflyer-hero-title {
+    font-size: 40px;
+  }
+  
+  .theme-eflyer .eflyer-hero {
+    padding-top: 230px;
+    padding-bottom: 80px;
+  }
+}
+
+@media (max-width: 768px) {
+  .theme-eflyer .eflyer-top-nav {
+    display: none; /* Hide top nav on mobile, use hamburger */
+  }
+  
+  .theme-eflyer .eflyer-top-bar-content {
+    padding: 10px 20px;
+    clip-path: none; /* Remove clip path on mobile for full width */
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .theme-eflyer .eflyer-logo {
+    font-size: 36px;
+  }
+  
+  .theme-eflyer .eflyer-hero-title {
+    font-size: 32px;
+  }
+  
+  .theme-eflyer .eflyer-slider-btn {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .theme-eflyer .eflyer-slider-btn.left { left: 10px; }
+  .theme-eflyer .eflyer-slider-btn.right { right: 10px; }
+  
+  .theme-eflyer .eflyer-cat-btn {
+    padding: 8px 12px;
+    font-size: 14px;
+    gap: 6px;
+  }
+}

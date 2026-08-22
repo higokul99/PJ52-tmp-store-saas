@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
 import { useStorefrontAuth } from '../context/StorefrontAuthContext';
 import { X, Mail, Lock, User } from 'lucide-react';
 
 export default function StorefrontLoginModal() {
-  const { login, register } = useAuth();
-  const { isLoginModalOpen, closeLoginModal } = useStorefrontAuth();
+  const { login, register, isLoginModalOpen, closeLoginModal } = useStorefrontAuth();
 
   const [isRegistering, setIsRegistering] = useState(true);
   const [name, setName] = useState('');
@@ -23,7 +21,7 @@ export default function StorefrontLoginModal() {
 
     let res;
     if (isRegistering) {
-      res = await register(name, email, password, 'customer');
+      res = await register(name, email, password);
     } else {
       res = await login(email, password);
     }

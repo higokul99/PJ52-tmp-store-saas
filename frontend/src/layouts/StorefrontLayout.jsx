@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { Search, ShoppingCart, ChevronDown, User, LogOut } from 'lucide-react';
+import { Search, ShoppingCart, ChevronDown, User, LogOut, Heart, Package } from 'lucide-react';
 import { useStorefrontCart } from '../context/StorefrontCartContext';
 import { useStorefrontAuth } from '../context/StorefrontAuthContext';
-import { useAuth } from '../context/AuthContext';
+import { resolveStoreTheme } from '../utils/themeResolver';
 import StorefrontLoginModal from '../components/StorefrontLoginModal';
+import '../styles/theme-eflyer.css';
 
 export default function StorefrontLayout({ storeData, categories = [], products = [] }) {
   const { cartCount } = useStorefrontCart();
-  const { user, logout } = useAuth();
-  const { openLoginModal } = useStorefrontAuth();
+  const { user, logout, openLoginModal } = useStorefrontAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState(new URLSearchParams(location.search).get('search') || '');
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('All Category');
   
   const getBasePath = () => {
     const p = window.location.pathname;
@@ -21,7 +23,9 @@ export default function StorefrontLayout({ storeData, categories = [], products 
   };
   const basePath = getBasePath();
 
-  const isApparelFocused = storeData?.name?.toLowerCase().includes('ajil') || storeData?.name?.toLowerCase().includes('apparel');
+  const theme = resolveStoreTheme(storeData);
+  const useModernHeader = ['theme-hexashop', 'theme-jewelry', 'theme-beauty', 'theme-home', 'theme-footwear'].includes(theme);
+  const isEflyer = theme === 'theme-eflyer';
 
   // Compute the combined list of categories (same logic as StorefrontHome)
   const productCategories = [];
@@ -71,103 +75,267 @@ export default function StorefrontLayout({ storeData, categories = [], products 
       element.scrollIntoView({ behavior: 'smooth' });
     }
   };
+  const isHome = location.pathname === basePath || location.pathname === `${basePath}/`;
+
   return (
-    <div className="storefront-body">
-      {/* Flipkart-Style Header */}
-      <header className="storefront-header">
-        <div className="storefront-header-content">
-          <div className="storefront-logo">
-            <span className="storefront-logo-text">{storeData.name}</span>
-            <div className="storefront-logo-sub">Explore <span className="plus-icon">Plus</span></div>
-          </div>
+    <div className={`storefront-body ${theme} ${isHome ? 'is-home' : ''}`}>
+      {isEflyer ? (
+        <>
+          {isHome && (
+            <div className="eflyer-banner-wrapper">
+              <header className="eflyer-header">
+                <div className="eflyer-middle-bar">
+                  <Link to={basePath} className="eflyer-logo">
+                    {storeData?.name || 'Eflyer'}
+                  </Link>
+                </div>
+                <div className="eflyer-bottom-bar">
+                  <div className="eflyer-bottom-bar-content">
+                    
+                    <div className="dropdown eflyer-category-dropdown" style={{ position: 'relative' }}>
+                      <button 
+                        className="eflyer-cat-btn" 
+                        type="button" 
+                        onClick={() => setIsCategoryOpen(!isCategoryOpen)}
+                      >
+                        {selectedCategory} <ChevronDown size={14} />
+                      </button>
+                      {isCategoryOpen && (
+                        <ul className="dropdown-menu show" style={{ position: 'absolute', top: '100%', left: 0, zIndex: 1000 }}>
+                          <li>
+                            <button className="dropdown-item" onClick={() => { setSelectedCategory('All Category'); setIsCategoryOpen(false); }}>All Category</button>
+                          </li>
+                          {activeCategories && activeCategories.map(cat => (
+                            <li key={cat.id || cat.name}>
+                              <button 
+                                className="dropdown-item" 
+                                onClick={(e) => {
+                                  setSelectedCategory(cat.name);
+                                  setIsCategoryOpen(false);
+                                  scrollToSection(e, cat.slug);
+                                }}
+                              >
+                                {cat.name}
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
 
-          <div className="storefront-search-bar">
-            <input
-              type="text"
-              placeholder={`Search for products, brands and more in ${storeData.name}`}
-              className="storefront-search-input"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  navigate(`${basePath}?search=${encodeURIComponent(searchQuery)}`);
-                }
-              }}
-            />
-            <button className="storefront-search-btn" onClick={() => navigate(`${basePath}?search=${encodeURIComponent(searchQuery)}`)}>
-              <Search size={18} style={{ color: '#2874f0' }} />
-            </button>
-          </div>
+                    <div className="eflyer-search-container">
+                      <input
+                        type="text"
+                        placeholder={`Search for products...`}
+                        className="eflyer-search-input"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            navigate(`${basePath}?search=${encodeURIComponent(searchQuery)}`);
+                          }
+                        }}
+                      />
+                      <button className="eflyer-search-btn" onClick={() => navigate(`${basePath}?search=${encodeURIComponent(searchQuery)}`)}>
+                        <Search size={18} />
+                      </button>
+                    </div>
 
-          <div className="storefront-nav-actions">
-            {user && user.id ? (
-              <div className="d-flex align-items-center gap-3">
-                <span className="text-white fs-7 fw-semibold d-none d-md-block">Hello, {user.name}</span>
-                <button 
-                  className="btn bg-white fw-bold px-3 rounded-1 shadow-sm text-danger" 
-                  style={{ height: '36px', border: 'none' }}
-                  onClick={logout}
+                    <div className="eflyer-actions">
+                      <Link to={`${basePath}/wishlist`} className="eflyer-action-btn position-relative">
+                        <Heart size={24} />
+                      </Link>
+                      <Link to={`${basePath}/cart`} className="eflyer-action-btn position-relative">
+                        <ShoppingCart size={24} />
+                        {cartCount > 0 && (
+                          <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style={{ fontSize: '0.65rem' }}>
+                            {cartCount}
+                          </span>
+                        )}
+                      </Link>
+                      {user && user.id ? (
+                        <>
+                          <span className="eflyer-welcome-text fw-bold text-white text-nowrap d-none d-md-inline-block me-3" style={{ alignSelf: 'center' }}>
+                            Welcome, {user.name.split(' ')[0]}
+                          </span>
+                          <button className="eflyer-action-btn" onClick={logout}>
+                            <LogOut size={24} />
+                          </button>
+                        </>
+                      ) : (
+                        <button className="eflyer-action-btn" onClick={openLoginModal}>
+                          <User size={24} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </header>
+            </div>
+          )}
+        </>
+      ) : useModernHeader ? (
+        /* Hexashop/Modern-Style Header for Luxury/Minimal/Fashion Themes */
+        <header className="storefront-header hexashop-header">
+          <div className="hexashop-header-content">
+            <div className="storefront-logo hexashop-logo" onClick={() => navigate(basePath)}>
+              {storeData?.logo_url ? (
+                <img src={storeData.logo_url} alt={storeData.name} className="storefront-logo-img" />
+              ) : (
+                <span className="storefront-logo-text">
+                  {storeData?.name || 'Store'}
+                  {theme === 'theme-home' && <span className="furni-dot">.</span>}
+                </span>
+              )}
+            </div>
+
+            <nav className="hexashop-nav">
+              <Link to={basePath} className="hexashop-nav-item">Home</Link>
+              {activeCategories && activeCategories.map(cat => (
+                <a
+                  key={cat.id || cat.name}
+                  href={`#${cat.slug}`}
+                  onClick={(e) => scrollToSection(e, cat.slug)}
+                  className="hexashop-nav-item"
                 >
-                  Logout
+                  {cat.name}
+                </a>
+              ))}
+            </nav>
+
+            <div className="hexashop-nav-actions">
+              {user && user.id ? (
+                <div className="d-flex align-items-center gap-3">
+                  <span className="fs-7 fw-semibold d-none d-md-block" style={{ color: '#2a2a2a' }}>Hi, {user.name}</span>
+                  <button onClick={logout} className="hexashop-icon-btn text-danger border-0 bg-transparent p-0" title="Logout">
+                    <LogOut size={20} />
+                  </button>
+                </div>
+              ) : (
+                <button onClick={openLoginModal} className="hexashop-icon-btn border-0 bg-transparent p-0" title="Login">
+                  <User size={20} />
                 </button>
-              </div>
-            ) : (
-              <button 
-                className="btn bg-white fw-bold px-4 rounded-1 shadow-sm d-flex align-items-center justify-content-center" 
-                style={{ color: '#2874f0', height: '36px', border: 'none' }}
-                onClick={openLoginModal}
-              >
-                Create account
-              </button>
-            )}
+              )}
 
-            <Link to={`${basePath}/wishlist`} className="storefront-nav-item text-decoration-none">
-              Wishlist
-            </Link>
-
-            <Link to={`${basePath}/orders`} className="storefront-nav-item text-decoration-none">
-              My Orders
-            </Link>
-
-            <Link to={`${basePath}/cart`} className="storefront-nav-item cart-item text-decoration-none">
-              <div className="position-relative">
-                <ShoppingCart size={18} />
+              <Link to={`${basePath}/wishlist`} className="hexashop-icon-btn text-decoration-none">
+                <Heart size={20} />
+              </Link>
+              <Link to={`${basePath}/orders`} className="hexashop-icon-btn text-decoration-none" title="Orders">
+                <Package size={20} />
+              </Link>
+              <Link to={`${basePath}/cart`} className="hexashop-icon-btn text-decoration-none position-relative">
+                <ShoppingCart size={20} />
                 {cartCount > 0 && (
-                  <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style={{ fontSize: '0.65rem', transform: 'translate(-30%, -30%)!important' }}>
+                  <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-dark" style={{ fontSize: '0.65rem' }}>
                     {cartCount}
                   </span>
                 )}
-              </div>
-              <span>Cart</span>
-            </Link>
+              </Link>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
+      ) : (
+        <>
+          {/* Standard Retail (Flipkart-Style) Header */}
+          <header className="storefront-header">
+            <div className="storefront-header-content">
+              <div className="storefront-logo" onClick={() => navigate(basePath)}>
+                <span className="storefront-logo-text" style={{ cursor: 'pointer' }}>
+                  {storeData.name}
+                  {activeTheme === 'theme-home' && <span className="furni-dot">.</span>}
+                </span>
+                <div className="storefront-logo-sub">Explore <span className="plus-icon">Plus</span></div>
+              </div>
+
+              <div className="storefront-search-bar">
+                <input
+                  type="text"
+                  placeholder={`Search for products, brands and more in ${storeData.name}`}
+                  className="storefront-search-input"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      navigate(`${basePath}?search=${encodeURIComponent(searchQuery)}`);
+                    }
+                  }}
+                />
+                <button className="storefront-search-btn" onClick={() => navigate(`${basePath}?search=${encodeURIComponent(searchQuery)}`)}>
+                  <Search size={18} style={{ color: '#2874f0' }} />
+                </button>
+              </div>
+
+              <div className="storefront-nav-actions">
+                {user && user.id ? (
+                  <div className="d-flex align-items-center gap-3">
+                    <span className="text-white fs-7 fw-semibold d-none d-md-block">Hello, {user.name}</span>
+                    <button 
+                      className="btn bg-white fw-bold px-3 rounded-1 shadow-sm text-danger" 
+                      style={{ height: '36px', border: 'none' }}
+                      onClick={logout}
+                    >
+                      Logout
+                    </button>
+                  </div>
+                ) : (
+                  <button 
+                    className="btn bg-white fw-bold px-4 rounded-1 shadow-sm d-flex align-items-center justify-content-center" 
+                    style={{ color: '#2874f0', height: '36px', border: 'none' }}
+                    onClick={openLoginModal}
+                  >
+                    Create account
+                  </button>
+                )}
+
+                <Link to={`${basePath}/wishlist`} className="storefront-nav-item text-decoration-none">
+                  Wishlist
+                </Link>
+
+                <Link to={`${basePath}/orders`} className="storefront-nav-item text-decoration-none">
+                  My Orders
+                </Link>
+
+                <Link to={`${basePath}/cart`} className="storefront-nav-item cart-item text-decoration-none">
+                  <div className="position-relative">
+                    <ShoppingCart size={18} />
+                    {cartCount > 0 && (
+                      <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style={{ fontSize: '0.65rem', transform: 'translate(-30%, -30%)!important' }}>
+                        {cartCount}
+                      </span>
+                    )}
+                  </div>
+                  <span>Cart</span>
+                </Link>
+              </div>
+            </div>
+          </header>
+
+          {/* Categories Sub-header */}
+          <div className="storefront-categories-nav">
+            <div className="storefront-categories-content">
+              {activeCategories && activeCategories.length > 0 ? (
+                activeCategories.map(cat => {
+                  const sectionId = cat.slug;
+                  return (
+                    <a
+                      key={cat.id || cat.name}
+                      href={`#${sectionId}`}
+                      onClick={(e) => scrollToSection(e, sectionId)}
+                      className="category-item text-decoration-none"
+                    >
+                      {cat.name} <ChevronDown size={12} />
+                    </a>
+                  );
+                })
+              ) : (
+                <div className="category-placeholder">No categories defined</div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
 
       <StorefrontLoginModal />
-
-      {/* Categories Sub-header */}
-      <div className="storefront-categories-nav">
-        <div className="storefront-categories-content">
-          {activeCategories && activeCategories.length > 0 ? (
-            activeCategories.map(cat => {
-              const sectionId = cat.slug;
-              return (
-                <a
-                  key={cat.id || cat.name}
-                  href={`#${sectionId}`}
-                  onClick={(e) => scrollToSection(e, sectionId)}
-                  className="category-item text-decoration-none"
-                >
-                  {cat.name} <ChevronDown size={12} />
-                </a>
-              );
-            })
-          ) : (
-            <div className="category-placeholder">No categories defined</div>
-          )}
-        </div>
-      </div>
 
       <main className="storefront-main-content">
         <Outlet />
